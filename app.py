@@ -8,7 +8,7 @@ from ai_engine import ai_response
 from database import connect, create_tables
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
-
+from flask import jsonify
 app = Flask(__name__)
 app.secret_key = "dhanvantri_secret"
 
@@ -213,6 +213,7 @@ def home():
         return redirect(url_for("login"))
 
     chats = load_chats()
+
     if not chats:
         return redirect(url_for("new_chat"))
 
@@ -235,6 +236,7 @@ def new_chat():
     })
 
     save_chats(chats)
+
     return redirect(url_for("chat", chat_id=chat_id))
 
 @app.route("/delete/<chat_id>")
@@ -248,12 +250,66 @@ def delete_chat(chat_id):
     save_chats(chats)
     return redirect(url_for("home"))
 
-# ---------------- MAIN CHAT ---------------- #
-# ---------------- MAIN CHAT ---------------- #
-@app.route("/chat/<chat_id>", methods=["GET", "POST"])
-def chat(chat_id):
-    if "user" not in session:
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    message = None
+
+    if request.method == "POST":
+        email = request.form["email"]
+
+        conn = connect()
+        cur = conn.cursor()
+
+        cur.execute("SELECT * FROM users WHERE email=?", (email,))
+        user = cur.fetchone()
+
+        if user:
+            # Generate token
+            token = serializer.dumps(email, salt="reset-password")
+
+            reset_link = url_for("reset_password", token=token, _external=True)
+
+            # Send email
+            msg = Message("Password Reset - Dhanvantri",
+                          sender=app.config['MAIL_USERNAME'],
+                          recipients=[email])
+
+            msg.body = f"Click to reset your password:\n{reset_link}"
+
+            mail.send(msg)
+
+            message = "Reset link sent to your email 🌿"
+        else:
+            message = "Email not found"
+
+        conn.close()
+
+    return render_template("forgot.html", message=message)
+
+@app.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    try:
+        email = serializer.loads(token, salt="reset-password", max_age=300)
+    except:
+        return "❌ Invalid or expired link"
+
+    if request.method == "POST":
+        new_password = generate_password_hash(request.form["password"])
+
+        conn = connect()
+        cur = conn.cursor()
+
+        cur.execute("UPDATE users SET password=? WHERE email=?",
+                    (new_password, email))
+        conn.commit()
+        conn.close()
+
         return redirect(url_for("login"))
+
+    return render_template("reset.html")
+# ---------------- MAIN CHAT ---------------- #
+@app.route("/chat/<chat_id>", methods=["GET"])
+def chat(chat_id):
 
     chats = load_chats()
     chat = next((c for c in chats if c["id"] == chat_id), None)
@@ -261,52 +317,61 @@ def chat(chat_id):
     if not chat:
         return redirect(url_for("home"))
 
-    if request.method == "POST":
-        user_input = request.form.get("question", "").strip()
-
-        if user_input:
-            rule_based = get_medical_response(user_input)
-
-            # ✅ FINAL DECISION LOGIC
-            if rule_based is not None:
-                answer = rule_based
-            else:
-                answer = ai_response(user_input)
-
-            # 🌿 Herbs (only adds extra info, safe)
-            herbs = suggest_herbs(user_input)
-            if herbs:
-                answer += "\n\n🌿 Recommended Herbs:\n" + "\n".join(f"- {h}" for h in herbs)
-
-            # 💬 Save messages
-            chat["messages"].append({
-                "role": "user",
-                "content": user_input,
-                "time": datetime.now().strftime("%H:%M")
-            })
-
-            answer = answer.replace("\n", "<br>")
-
-            chat["messages"].append({
-                "role": "bot",
-                "content": answer,
-                "time": datetime.now().strftime("%H:%M")
-            })
-
-            if chat["title"] == "New Chat":
-                chat["title"] = generate_chat_title(user_input)
-            save_chats(chats)
-
-        return redirect(url_for("chat", chat_id=chat_id))
-
     return render_template(
         "index.html",
-        chats=chats,
+        chats=load_chats(),
         current_chat=chat,
-        user=session["user"],
+        user=session.get("user"),
         tip=random.choice(DAILY_TIPS),
         yoga=random.choice(YOGA_POSES)
     )
+@app.route("/chat", methods=["POST"])
+def chat_api():
+
+    data = request.get_json()
+    chat_id = data.get("chat_id")
+    user_input = data.get("question", "").strip()
+
+    if not chat_id or not user_input:
+        return jsonify({"reply": "Missing data"}), 400
+
+    chats = load_chats()
+    chat = next((c for c in chats if c["id"] == chat_id), None)
+
+    if not chat:
+        return jsonify({"reply": "Chat not found"}), 404
+
+    # AI logic
+    rule_based = get_medical_response(user_input)
+
+    if rule_based is not None:
+        answer = rule_based
+    else:
+        answer = ai_response(user_input)
+
+    herbs = suggest_herbs(user_input)
+    if herbs:
+        answer += "\n\n🌿 Recommended Herbs:\n" + "\n".join(f"- {h}" for h in herbs)
+
+    # save messages
+    chat["messages"].append({
+        "role": "user",
+        "content": user_input,
+        "time": datetime.now().strftime("%H:%M")
+    })
+
+    chat["messages"].append({
+        "role": "bot",
+        "content": answer,
+        "time": datetime.now().strftime("%H:%M")
+    })
+
+    if chat["title"] == "New Chat":
+        chat["title"] = generate_chat_title(user_input)
+
+    save_chats(chats)
+
+    return jsonify({"reply": answer})
 # ---------------- RUN ---------------- #
 if __name__ == "__main__":
     init_files()
