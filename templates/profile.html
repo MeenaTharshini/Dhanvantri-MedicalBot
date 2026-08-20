@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dhanvantri | My Wellness Profile</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='logo1.png') }}">
+
+    <!-- Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: 'Poppins', sans-serif;
+
+            background: #080808;
+            color: white;
+
+            overflow-x: hidden;
+
+            cursor: none;
+        }
+
+
+        /* =====================================================
+           THREE.JS BACKGROUND
+        ===================================================== */
+
+        #bg {
+            position: fixed;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            z-index: -3;
+            overflow: hidden;
+        }
+
+
+        /* =====================================================
+           CURSOR
+        ===================================================== */
+
+        .cursor {
+
+            position: fixed;
+
+            width: 10px;
+            height: 10px;
+
+            border-radius: 50%;
+
+            background: gold;
+
+            pointer-events: none;
+
+            z-index: 9999;
+
+            transform: translate(-50%, -50%);
+
+            box-shadow:
+                0 0 8px gold,
+                0 0 18px rgba(255, 215, 0, 0.7);
+        }
+
+
+        /* =====================================================
+           CURSOR TRAIL
+        ===================================================== */
+
+        #trailCanvas {
+
+            position: fixed;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            pointer-events: none;
+
+            z-index: 1;
+        }
+
+
+        /* =====================================================
+           MAIN CONTAINER
+        ===================================================== */
+
+        .profile-container {
+
+            width: 92%;
+            max-width: 1000px;
+
+            margin: 0 auto;
+
+            padding: 35px 0 50px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+
+        /* =====================================================
+           TOP NAVIGATION
+        ===================================================== */
+
+        .top-nav {
+
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 12px 18px;
+
+            margin-bottom: 25px;
+
+            background:
+                rgba(255, 255, 255, 0.055);
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.08);
+
+            border-radius: 14px;
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 10px 35px
+                rgba(0, 0, 0, 0.25);
+        }
+
+
+        .brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            color: white;
+
+            text-decoration: none;
+
+            font-weight: 500;
+        }
+
+
+        .brand-icon {
+
+            width: 36px;
+            height: 36px;
+
+            border-radius: 10px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            color: #111;
+
+            font-size: 17px;
+
+            box-shadow:
+                0 0 18px
+                rgba(255, 215, 0, 0.25);
+        }
+
+
+        .brand-text {
+            font-size: 15px;
+        }
+
+
+        .nav-links {
+
+            display: flex;
+
+            gap: 8px;
+        }
+
+
+        .nav-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 8px 13px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            color: #ddd;
+
+            font-size: 13px;
+
+            background:
+                rgba(255, 255, 255, 0.05);
+
+            transition: 0.3s ease;
+        }
+
+
+        .nav-btn:hover {
+
+            color: #111;
+
+            background: gold;
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            text-align: center;
+
+            padding: 25px 15px 30px;
+        }
+
+
+        .logo-wrapper {
+
+            width: 82px;
+            height: 82px;
+
+            margin:
+                0 auto 15px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255, 215, 0, 0.18),
+                    rgba(255, 255, 255, 0.03)
+                );
+
+            border:
+                1px solid
+                rgba(255, 215, 0, 0.35);
+
+            box-shadow:
+                0 0 30px
+                rgba(255, 215, 0, 0.15),
+
+                inset 0 0 20px
+                rgba(255, 215, 0, 0.05);
+        }
+
+
+        .header img {
+
+            width: 60px;
+            height: 60px;
+
+            object-fit: contain;
+        }
+
+
+        .header h1 {
+
+            margin:
+                5px 0 8px;
+
+            font-size: 32px;
+
+            font-weight: 500;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #fff,
+                    #ffd700
+                );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        .header p {
+
+            margin:
+                0 auto;
+
+            max-width: 650px;
+
+            color: #aaa;
+
+            font-size: 14px;
+
+            line-height: 1.7;
+        }
+
+
+        /* =====================================================
+           MAIN CARD
+        ===================================================== */
+
+        .profile-card {
+
+            position: relative;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255,255,255,0.075),
+                    rgba(255,255,255,0.035)
+                );
+
+            border:
+                1px solid
+                rgba(255,255,255,0.09);
+
+            border-radius: 22px;
+
+            padding: 30px;
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 25px 70px
+                rgba(0,0,0,0.45),
+
+                inset 0 1px 0
+                rgba(255,255,255,0.04);
+
+            overflow: hidden;
+        }
+
+
+        .profile-card::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: 8%;
+            right: 8%;
+
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,215,0,0.6),
+                    transparent
+                );
+        }
+
+
+        /* =====================================================
+           SECTION HEADING
+        ===================================================== */
+
+        .section-heading {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .section-icon {
+
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,215,0,0.10);
+
+            border:
+                1px solid
+                rgba(255,215,0,0.25);
+
+            color: #ffd700;
+
+            font-size: 18px;
+        }
+
+
+        .section-heading h2 {
+
+            margin: 0;
+
+            font-size: 19px;
+
+            font-weight: 500;
+
+            color: white;
+        }
+
+
+        .section-heading p {
+
+            margin:
+                3px 0 0;
+
+            font-size: 12px;
+
+            color: #888;
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        .message {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 13px 15px;
+
+            margin-bottom: 22px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(255,215,0,0.08);
+
+            border:
+                1px solid
+                rgba(255,215,0,0.2);
+
+            color: #f5d75c;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           FORM GRID
+        ===================================================== */
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 20px;
+        }
+
+
+        /* =====================================================
+           FORM GROUP
+        ===================================================== */
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .form-group.full {
+
+            grid-column:
+                1 / -1;
+        }
+
+
+        /* =====================================================
+           LABELS
+        ===================================================== */
+
+        label {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 8px;
+
+            color: #ddd;
+
+            font-size: 13px;
+
+            font-weight: 500;
+        }
+
+
+        label i {
+
+            width: 16px;
+
+            color: #d8b52e;
+
+            font-size: 13px;
+
+            text-align: center;
+        }
+
+
+        .field-hint {
+
+            color: #777;
+
+            font-size: 11px;
+
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           INPUTS
+        ===================================================== */
+
+        input,
+        select {
+
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border-radius: 11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.055);
+
+            color: white;
+
+            font-family:
+                'Poppins',
+                sans-serif;
+
+            font-size: 13px;
+
+            transition:
+                border 0.3s ease,
+                box-shadow 0.3s ease,
+                background 0.3s ease;
+        }
+
+
+        input::placeholder {
+
+            color: #666;
+        }
+
+
+        select {
+
+            cursor: pointer;
+        }
+
+
+        select option {
+
+            background: #171717;
+
+            color: white;
+        }
+
+
+        input:hover,
+        select:hover {
+
+            background:
+                rgba(255,255,255,0.075);
+        }
+
+
+        input:focus,
+        select:focus {
+
+            border-color:
+                rgba(255,215,0,0.7);
+
+            background:
+                rgba(255,215,0,0.035);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(255,215,0,0.08),
+
+                0 0 18px
+                rgba(255,215,0,0.05);
+        }
+
+
+        /* =====================================================
+           WELLNESS INTEREST
+        ===================================================== */
+
+        .interest-box {
+
+            position: relative;
+        }
+
+
+        .interest-icon {
+
+            position: absolute;
+
+            left: 13px;
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            color: #d8b52e;
+
+            font-size: 13px;
+
+            pointer-events: none;
+        }
+
+
+        .interest-box input {
+
+            padding-left: 38px;
+        }
+
+
+        /* =====================================================
+           PRIVACY NOTE
+        ===================================================== */
+
+        .privacy-note {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 10px;
+
+            margin-top: 28px;
+
+            padding: 17px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,215,0,0.08),
+                    rgba(255,255,255,0.035)
+                );
+
+            border:
+                1px solid
+                rgba(255,215,0,0.13);
+
+            color: #aaa;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+
+        .privacy-note > i {
+
+            color: #d8b52e;
+
+            margin-top: 3px;
+
+            flex-shrink: 0;
+        }
+
+
+        .privacy-note strong {
+
+            color: #f0d35a;
+        }
+
+
+        /* =====================================================
+           SAVE BUTTON
+        ===================================================== */
+
+        .save-button {
+
+            width: 100%;
+
+            margin-top: 22px;
+
+            padding: 14px 18px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            color: #111;
+
+            font-family:
+                'Poppins',
+                sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 25px
+                rgba(255,215,0,0.16);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                filter 0.25s ease;
+        }
+
+
+        .save-button i {
+
+            margin-right: 7px;
+        }
+
+
+        .save-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            filter:
+                brightness(1.08);
+
+            box-shadow:
+                0 12px 35px
+                rgba(255,215,0,0.28);
+        }
+
+
+        .save-button:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        /* =====================================================
+           BOTTOM LINKS
+        ===================================================== */
+
+        .bottom-actions {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 12px;
+
+            margin-top: 20px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .back-link,
+        .dashboard-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 9px 14px;
+
+            border-radius: 9px;
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            color: #aaa;
+
+            background:
+                rgba(255,255,255,0.045);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.07);
+
+            transition: 0.3s ease;
+        }
+
+
+        .back-link:hover,
+        .dashboard-link:hover {
+
+            color: #111;
+
+            background: gold;
+
+            border-color: gold;
+        }
+
+
+        /* =====================================================
+           DECORATIVE ORBS
+        ===================================================== */
+
+        .gold-orb {
+
+            position: fixed;
+
+            width: 180px;
+            height: 180px;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    rgba(255,215,0,0.08),
+                    transparent 70%
+                );
+
+            pointer-events: none;
+
+            z-index: -1;
+
+            animation:
+                floatOrb 7s ease-in-out infinite;
+        }
+
+
+        .orb-one {
+
+            top: 10%;
+            left: -70px;
+        }
+
+
+        .orb-two {
+
+            right: -70px;
+            bottom: 10%;
+
+            animation-delay:
+                -3s;
+        }
+
+
+        @keyframes floatOrb {
+
+            0%, 100% {
+                transform:
+                    translateY(0);
+            }
+
+            50% {
+                transform:
+                    translateY(-25px);
+            }
+        }
+
+
+        /* =====================================================
+           SCROLLBAR
+        ===================================================== */
+
+        ::-webkit-scrollbar {
+
+            width: 6px;
+        }
+
+
+        ::-webkit-scrollbar-track {
+
+            background: #090909;
+        }
+
+
+        ::-webkit-scrollbar-thumb {
+
+            background: #8d7415;
+
+            border-radius: 10px;
+        }
+
+
+        ::-webkit-scrollbar-thumb:hover {
+
+            background: gold;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            body {
+                cursor: auto;
+            }
+
+
+            .cursor {
+                display: none;
+            }
+
+
+            .profile-container {
+
+                width: 94%;
+
+                padding:
+                    15px 0 30px;
+            }
+
+
+            .top-nav {
+
+                padding:
+                    10px 12px;
+            }
+
+
+            .brand-text {
+
+                font-size: 13px;
+            }
+
+
+            .nav-links {
+
+                gap: 4px;
+            }
+
+
+            .nav-btn {
+
+                padding:
+                    7px 9px;
+
+                font-size: 11px;
+            }
+
+
+            .header {
+
+                padding:
+                    18px 8px 25px;
+            }
+
+
+            .header h1 {
+
+                font-size: 25px;
+            }
+
+
+            .header p {
+
+                font-size: 12px;
+            }
+
+
+            .logo-wrapper {
+
+                width: 70px;
+                height: 70px;
+            }
+
+
+            .header img {
+
+                width: 52px;
+                height: 52px;
+            }
+
+
+            .profile-card {
+
+                padding:
+                    20px 16px;
+
+                border-radius: 18px;
+            }
+
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+
+                gap: 17px;
+            }
+
+
+            .form-group.full {
+
+                grid-column: auto;
+            }
+
+
+            .section-heading h2 {
+
+                font-size: 17px;
+            }
+
+
+            .privacy-note {
+
+                font-size: 11px;
+            }
+
+        }
+
+
+        /* =====================================================
+           VERY SMALL DEVICES
+        ===================================================== */
+
+        @media (max-width: 420px) {
+
+            .brand-text {
+
+                display: none;
+            }
+
+
+            .nav-btn {
+
+                font-size: 10px;
+            }
+
+
+            .header h1 {
+
+                font-size: 22px;
+            }
+
+
+            .profile-card {
+
+                padding:
+                    18px 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         BACKGROUND
+    ===================================================== -->
+
+    <div id="bg"></div>
+
+    <canvas id="trailCanvas"></canvas>
+
+    <div class="gold-orb orb-one"></div>
+    <div class="gold-orb orb-two"></div>
+
+    <div class="cursor" id="cursor"></div>
+
+
+    <!-- =====================================================
+         MAIN
+    ===================================================== -->
+
+    <div class="profile-container">
+
+
+        <!-- =================================================
+             TOP NAVIGATION
+        ================================================= -->
+
+        <div class="top-nav">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="brand"
+            >
+
+                <span class="brand-icon">
+
+                    <i class="fa-solid fa-leaf"></i>
+
+                </span>
+
+                <span class="brand-text">
+                    Dhanvantri
+                </span>
+
+            </a>
+
+
+            <div class="nav-links">
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="nav-btn"
+                >
+
+                    <i class="fa-solid fa-comments"></i>
+
+                    Chat
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="nav-btn"
+                >
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                    Dashboard
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             HEADER
+        ================================================= -->
+
+        <div class="header">
+
+            <div class="logo-wrapper">
+
+                <img
+                    src="{{ url_for('static', filename='logo1.png') }}"
+                    alt="Dhanvantri Logo"
+                >
+
+            </div>
+
+
+            <h1>
+
+                <i class="fa-solid fa-leaf"></i>
+
+                My Wellness Profile
+
+            </h1>
+
+
+            <p>
+
+                Help Dhanvantri understand your wellness goals
+                and personalize your wellness experience.
+
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             PROFILE CARD
+        ================================================= -->
+
+        <div class="profile-card">
+
+
+            <!-- MESSAGE -->
+
+            {% if message %}
+
+                <div class="message">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    {{ message }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- SECTION HEADING -->
+
+            <div class="section-heading">
+
+                <div class="section-icon">
+
+                    <i class="fa-solid fa-spa"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Personal Wellness Information
+                    </h2>
+
+                    <p>
+                        Your information helps personalize your wellness guidance.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 PROFILE FORM
+            ================================================= -->
+
+            <form
+                method="POST"
+                action="{{ url_for('profile') }}"
+            >
+
+                <div class="form-grid">
+
+
+                    <!-- AGE -->
+
+                    <div class="form-group">
+
+                        <label for="age">
+
+                            <i class="fa-solid fa-cake-candles"></i>
+
+                            Age
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            min="1"
+                            max="120"
+                            value="{{ profile.age if profile else '' }}"
+                            placeholder="Enter your age"
+                        >
+
+                    </div>
+
+
+                    <!-- GENDER -->
+
+                    <div class="form-group">
+
+                        <label for="gender">
+
+                            <i class="fa-solid fa-user"></i>
+
+                            Gender
+
+                        </label>
+
+
+                        <select
+                            id="gender"
+                            name="gender"
+                        >
+
+                            <option value="">
+                                Prefer not to say
+                            </option>
+
+
+                            <option
+                                value="Female"
+                                {% if profile and profile.gender == 'Female' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Female
+                            </option>
+
+
+                            <option
+                                value="Male"
+                                {% if profile and profile.gender == 'Male' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Male
+                            </option>
+
+
+                            <option
+                                value="Other"
+                                {% if profile and profile.gender == 'Other' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Other
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- WELLNESS GOAL -->
+
+                    <div class="form-group">
+
+                        <label for="wellness_goal">
+
+                            <i class="fa-solid fa-bullseye"></i>
+
+                            Primary Wellness Goal
+
+                        </label>
+
+
+                        <select
+                            id="wellness_goal"
+                            name="wellness_goal"
+                        >
+
+                            <option value="">
+                                Select a goal
+                            </option>
+
+
+                            <option
+                                value="Better sleep"
+                                {% if profile and profile.wellness_goal == 'Better sleep' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Better Sleep
+                            </option>
+
+
+                            <option
+                                value="Stress management"
+                                {% if profile and profile.wellness_goal == 'Stress management' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Stress Management
+                            </option>
+
+
+                            <option
+                                value="Fitness"
+                                {% if profile and profile.wellness_goal == 'Fitness' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Fitness
+                            </option>
+
+
+                            <option
+                                value="Healthy diet"
+                                {% if profile and profile.wellness_goal == 'Healthy diet' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Healthy Diet
+                            </option>
+
+
+                            <option
+                                value="General wellness"
+                                {% if profile and profile.wellness_goal == 'General wellness' %}
+                                    selected
+                                {% endif %}
+                            >
+                                General Wellness
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- ACTIVITY LEVEL -->
+
+                    <div class="form-group">
+
+                        <label for="activity_level">
+
+                            <i class="fa-solid fa-person-running"></i>
+
+                            Activity Level
+
+                        </label>
+
+
+                        <select
+                            id="activity_level"
+                            name="activity_level"
+                        >
+
+                            <option value="">
+                                Select activity level
+                            </option>
+
+
+                            <option
+                                value="Low"
+                                {% if profile and profile.activity_level == 'Low' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Low
+                            </option>
+
+
+                            <option
+                                value="Moderate"
+                                {% if profile and profile.activity_level == 'Moderate' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Moderate
+                            </option>
+
+
+                            <option
+                                value="High"
+                                {% if profile and profile.activity_level == 'High' %}
+                                    selected
+                                {% endif %}
+                            >
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- SLEEP -->
+
+                    <div class="form-group">
+
+                        <label for="sleep_hours">
+
+                            <i class="fa-solid fa-bed"></i>
+
+                            Average Sleep
+
+                        </label>
+
+
+                        <input
+                            type="number"
+                            id="sleep_hours"
+                            name="sleep_hours"
+                            min="0"
+                            max="24"
+                            step="0.5"
+                            value="{{ profile.sleep_hours if profile else '' }}"
+                            placeholder="Example: 7.5"
+                        >
+
+
+                        <span class="field-hint">
+
+                            Hours of sleep per night
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- DIET -->
+
+                    <div class="form-group">
+
+                        <label for="dietary_preference">
+
+                            <i class="fa-solid fa-utensils"></i>
+
+                            Dietary Preference
+
+                        </label>
+
+
+                        <select
+                            id="dietary_preference"
+                            name="dietary_preference"
+                        >
+
+                            <option value="">
+                                Select preference
+                            </option>
+
+
+                            <option
+                                value="Vegetarian"
+                                {% if profile and profile.dietary_preference == 'Vegetarian' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Vegetarian
+                            </option>
+
+
+                            <option
+                                value="Non-vegetarian"
+                                {% if profile and profile.dietary_preference == 'Non-vegetarian' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Non-vegetarian
+                            </option>
+
+
+                            <option
+                                value="Vegan"
+                                {% if profile and profile.dietary_preference == 'Vegan' %}
+                                    selected
+                                {% endif %}
+                            >
+                                Vegan
+                            </option>
+
+
+                            <option
+                                value="No preference"
+                                {% if profile and profile.dietary_preference == 'No preference' %}
+                                    selected
+                                {% endif %}
+                            >
+                                No Preference
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- WELLNESS INTEREST -->
+
+                    <div class="form-group full">
+
+                        <label for="wellness_interest">
+
+                            <i class="fa-solid fa-seedling"></i>
+
+                            Wellness Interests
+
+                        </label>
+
+
+                        <div class="interest-box">
+
+                            <span class="interest-icon">
+
+                                <i class="fa-solid fa-sparkles"></i>
+
+                            </span>
+
+
+                            <input
+                                type="text"
+                                id="wellness_interest"
+                                name="wellness_interest"
+                                value="{{ profile.wellness_interest if profile else '' }}"
+                                placeholder="Example: yoga, meditation, Ayurveda, fitness"
+                            >
+
+                        </div>
+
+
+                        <span class="field-hint">
+
+                            Tell Dhanvantri what wellness topics interest you.
+
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     PRIVACY
+                ================================================= -->
+
+                <div class="privacy-note">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    <div>
+
+                        <strong>
+                            Your privacy matters.
+                        </strong>
+
+                        Dhanvantri uses the information you voluntarily
+                        provide to personalize wellness guidance.
+
+                        This information should not be treated as a
+                        medical diagnosis or a replacement for
+                        professional healthcare.
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SAVE
+                ================================================= -->
+
+                <button
+                    type="submit"
+                    class="save-button"
+                >
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Save My Wellness Profile
+
+                </button>
+
+
+            </form>
+
+
+            <!-- =================================================
+                 BOTTOM ACTIONS
+            ================================================= -->
+
+            <div class="bottom-actions">
+
+
+                <a
+                    href="{{ url_for('home') }}"
+                    class="back-link"
+                >
+
+                    <i class="fa-solid fa-arrow-left"></i>
+
+                    Back to Dhanvantri
+
+                </a>
+
+
+                <a
+                    href="{{ url_for('dashboard') }}"
+                    class="dashboard-link"
+                >
+
+                    <i class="fa-solid fa-chart-line"></i>
+
+                    View Dashboard
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+
+        /* =====================================================
+           CUSTOM CURSOR
+        ===================================================== */
+
+        const cursor =
+            document.getElementById("cursor");
+
+
+        window.addEventListener(
+            "mousemove",
+            function(e) {
+
+                cursor.style.left =
+                    e.clientX + "px";
+
+                cursor.style.top =
+                    e.clientY + "px";
+
+            }
+        );
+
+
+        /* =====================================================
+           CURSOR TRAIL
+        ===================================================== */
+
+        const canvas =
+            document.getElementById("trailCanvas");
+
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        function resizeCanvas() {
+
+            canvas.width =
+                window.innerWidth;
+
+            canvas.height =
+                window.innerHeight;
+
+        }
+
+
+        resizeCanvas();
+
+
+        window.addEventListener(
+            "resize",
+            resizeCanvas
+        );
+
+
+        let particles = [];
+
+
+        window.addEventListener(
+            "mousemove",
+            function(e) {
+
+                particles.push({
+
+                    x: e.clientX,
+
+                    y: e.clientY,
+
+                    size: 2,
+
+                    life: 35
+
+                });
+
+            }
+        );
+
+
+        function animateTrail() {
+
+            ctx.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            for (
+                let i = 0;
+                i < particles.length;
+                i++
+            ) {
+
+                const particle =
+                    particles[i];
+
+
+                ctx.beginPath();
+
+
+                ctx.arc(
+                    particle.x,
+                    particle.y,
+                    particle.size,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                ctx.fillStyle =
+                    `rgba(
+                        255,
+                        215,
+                        0,
+                        ${particle.life / 35}
+                    )`;
+
+
+                ctx.fill();
+
+
+                particle.size *= 0.94;
+
+                particle.life--;
+
+
+                if (particle.life <= 0) {
+
+                    particles.splice(i, 1);
+
+                    i--;
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animateTrail
+            );
+
+        }
+
+
+        animateTrail();
+
+
+        /* =====================================================
+           FORM SUBMIT FEEDBACK
+        ===================================================== */
+
+        const profileForm =
+            document.querySelector("form");
+
+
+        if (profileForm) {
+
+            profileForm.addEventListener(
+                "submit",
+                function() {
+
+                    const button =
+                        document.querySelector(
+                            ".save-button"
+                        );
+
+
+                    if (button) {
+
+                        button.innerHTML =
+                            '<i class="fa-solid fa-spinner fa-spin"></i> Saving Profile...';
+
+                        button.style.opacity =
+                            "0.8";
+
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+
+    <!-- =====================================================
+         THREE.JS
+    ===================================================== -->
+
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">
+    </script>
+
+
+    <script>
+
+        /* =====================================================
+           THREE.JS PARTICLE BACKGROUND
+        ===================================================== */
+
+        if (typeof THREE !== "undefined") {
+
+
+            const scene =
+                new THREE.Scene();
+
+
+            const camera =
+                new THREE.PerspectiveCamera(
+                    75,
+                    window.innerWidth /
+                    window.innerHeight,
+                    0.1,
+                    1000
+                );
+
+
+            const renderer =
+                new THREE.WebGLRenderer({
+
+                    alpha: true,
+
+                    antialias: true
+
+                });
+
+
+            renderer.setPixelRatio(
+                Math.min(
+                    window.devicePixelRatio,
+                    2
+                )
+            );
+
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+
+
+            renderer.domElement.style.position =
+                "fixed";
+
+
+            renderer.domElement.style.top =
+                "0";
+
+
+            renderer.domElement.style.left =
+                "0";
+
+
+            renderer.domElement.style.zIndex =
+                "-2";
+
+
+            document
+                .getElementById("bg")
+                .appendChild(
+                    renderer.domElement
+                );
+
+
+            camera.position.z = 5;
+
+
+            const geometry =
+                new THREE.BufferGeometry();
+
+
+            const count = 1000;
+
+
+            const positions =
+                new Float32Array(
+                    count * 3
+                );
+
+
+            for (
+                let i = 0;
+                i < count * 3;
+                i++
+            ) {
+
+                positions[i] =
+                    (Math.random() - 0.5) * 12;
+
+            }
+
+
+            geometry.setAttribute(
+                "position",
+
+                new THREE.BufferAttribute(
+                    positions,
+                    3
+                )
+            );
+
+
+            const material =
+                new THREE.PointsMaterial({
+
+                    color: 0xFFD700,
+
+                    size: 0.018,
+
+                    transparent: true,
+
+                    opacity: 0.65
+
+                });
+
+
+            const points =
+                new THREE.Points(
+                    geometry,
+                    material
+                );
+
+
+            scene.add(points);
+
+
+            function animateBackground() {
+
+                requestAnimationFrame(
+                    animateBackground
+                );
+
+
+                points.rotation.y +=
+                    0.0006;
+
+
+                points.rotation.x +=
+                    0.00015;
+
+
+                renderer.render(
+                    scene,
+                    camera
+                );
+
+            }
+
+
+            animateBackground();
+
+
+            window.addEventListener(
+                "resize",
+                function() {
+
+
+                    renderer.setSize(
+                        window.innerWidth,
+                        window.innerHeight
+                    );
+
+
+                    camera.aspect =
+                        window.innerWidth /
+                        window.innerHeight;
+
+
+                    camera.updateProjectionMatrix();
+
+                }
+            );
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

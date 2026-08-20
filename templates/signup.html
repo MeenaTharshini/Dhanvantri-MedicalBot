@@ -1,290 +1,2170 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Dhanvantri Signup</title>
+<html lang="en">
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo1.png') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dhanvantri AI | Signup</title>
+
+    <!-- =====================================================
+         GOOGLE FONT
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    >
+
+    <!-- =====================================================
+         THREE.JS
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js">
+    </script>
+
+    <!-- =====================================================
+         FAVICON
+    ====================================================== -->
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='logo1.png') }}"
+    >
+
 
 <style>
-/* ====== BODY & BACKGROUND ====== */
-body{
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:#0b0b0b;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    overflow:hidden;
-    flex-direction:column;
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
 }
 
-#bg{position:fixed;width:100%;height:100%;z-index:-2;}
-#trailCanvas{position:fixed;top:0;left:0;pointer-events:none;z-index:-1;}
-
-.cursor{
-    width:10px;height:10px;background:gold;border-radius:50%;
-    position:fixed;pointer-events:none;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 10px gold,0 0 20px gold;
+html {
+    width: 100%;
+    min-height: 100%;
 }
 
-/* ====== WRAPPER ====== */
-.signup-wrapper {
+body {
+
+    margin: 0;
+
+    width: 100%;
+    min-height: 100vh;
+
+    font-family: 'Poppins', sans-serif;
+
+    background: #080808;
+
+    color: white;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    cursor: none;
+}
+
+
+/* =========================================================
+   THREE.JS BACKGROUND
+========================================================= */
+
+#bg {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: -5;
+
+    overflow: hidden;
+}
+
+
+#bg::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at center,
+            transparent 15%,
+            rgba(0,0,0,0.25) 55%,
+            rgba(0,0,0,0.75) 100%
+        );
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CURSOR TRAIL
+========================================================= */
+
+#trailCanvas {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+
+    z-index: 9997;
+}
+
+
+/* =========================================================
+   CUSTOM CURSOR
+========================================================= */
+
+.cursor {
+
+    position: fixed;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #ffd700;
+
+    pointer-events: none;
+
+    z-index: 9999;
+
+    transform:
+        translate(-50%, -50%);
+
+    box-shadow:
+        0 0 8px #ffd700,
+        0 0 18px rgba(255,215,0,0.8),
+        0 0 30px rgba(255,215,0,0.35);
+}
+
+
+/* =========================================================
+   FLOATING GOLDEN ORBS
+========================================================= */
+
+.orb {
+
+    position: fixed;
+
+    width: 240px;
+    height: 240px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,215,0,0.08),
+            transparent 70%
+        );
+
+    pointer-events: none;
+
+    z-index: -1;
+
+    animation:
+        floatOrb 8s ease-in-out infinite;
+}
+
+
+.orb-one {
+
+    left: -130px;
+
+    top: 12%;
+}
+
+
+.orb-two {
+
+    right: -130px;
+
+    bottom: 8%;
+
+    animation-delay: -4s;
+}
+
+
+@keyframes floatOrb {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+    }
+
+    50% {
+
+        transform:
+            translateY(-25px);
+    }
+}
+
+
+/* =========================================================
+   SIGNUP WRAPPER
+========================================================= */
+
+.signup-wrapper {
+
+    width: 100%;
+
+    max-width: 450px;
+
+    padding:
+        25px 20px 45px;
+
+    margin: 0 auto;
+
+    opacity: 0;
+
+    transform:
+        translateY(20px);
+
+    transition:
+        opacity 0.9s ease,
+        transform 0.9s ease;
+
+    z-index: 10;
+}
+
+
+.signup-wrapper.show {
+
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand {
+
+    text-align: center;
+
+    margin-bottom: 15px;
+}
+
+
+.brand-logo {
+
+    width: 120px;
+    height: 120px;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(255,215,0,0.55)
+        )
+        drop-shadow(
+            0 0 28px
+            rgba(255,215,0,0.22)
+        );
+
+    margin-bottom: 3px;
+}
+
+
+.brand-title {
+
+    margin: 0;
+
+    font-size: 27px;
+
+    font-weight: 500;
+
+    letter-spacing: 0.5px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            #ffd700
+        );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+}
+
+
+.brand-subtitle {
+
+    margin:
+        4px 0 0;
+
+    color: #888;
+
+    font-size: 12px;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   SIGNUP CARD
+========================================================= */
+
+.signup-card {
+
+    position: relative;
+
+    padding: 25px;
+
+    border-radius: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,0.085),
+            rgba(255,255,255,0.035)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    backdrop-filter:
+        blur(22px);
+
+    -webkit-backdrop-filter:
+        blur(22px);
+
+    box-shadow:
+        0 25px 70px
+        rgba(0,0,0,0.5),
+
+        inset 0 1px 0
+        rgba(255,255,255,0.05);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   GOLD TOP LINE
+========================================================= */
+
+.signup-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: 12%;
+
+    width: 76%;
+
+    height: 1px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,215,0,0.85),
+            transparent
+        );
+}
+
+
+/* =========================================================
+   GOLD GLOW
+========================================================= */
+
+.signup-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 190px;
+    height: 190px;
+
+    top: -105px;
+    right: -95px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,215,0,0.07);
+
+    filter:
+        blur(20px);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-header {
+
+    text-align: center;
+
+    margin-bottom: 20px;
+}
+
+
+.card-header h2 {
+
+    margin: 0;
+
+    font-size: 21px;
+
+    font-weight: 500;
+
+    color: #fff;
+}
+
+
+.card-header p {
+
+    margin:
+        5px 0 0;
+
+    color: #888;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.error {
+
+    display: flex;
+
     align-items: center;
-    gap: 20px; /* space between logo and form */
+
+    gap: 9px;
+
+    padding:
+        10px 12px;
+
+    margin-bottom: 15px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,70,70,0.08);
+
+    border:
+        1px solid
+        rgba(255,80,80,0.22);
+
+    color: #ff8585;
+
+    font-size: 12px;
 }
 
-/* ====== LOGO ====== */
-.signup-logo {
-    width: 225px;
-    display: block;
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+
+    margin-bottom: 14px;
 }
 
-/* ====== FORM BOX ====== */
-.signup-box{
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(15px);
-    padding:30px;
-    border-radius:18px;
-    width:340px;
-    text-align:center;
-    box-shadow:0 0 30px rgba(255,215,0,0.25);
+
+.form-label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 6px;
+
+    color: #d7d7d7;
+
+    font-size: 12px;
+
+    font-weight: 500;
 }
 
-.signup-box p {
-    margin: 5px 0;
+
+.form-label i {
+
+    color: #d9b929;
+
+    width: 15px;
+
+    text-align: center;
 }
 
-.error{
-    color:red;
-    font-size:13px;
-    margin-bottom:10px;
+
+/* =========================================================
+   INPUT WRAPPER
+========================================================= */
+
+.input-wrapper {
+
+    position: relative;
 }
 
-/* ====== INPUTS ====== */
-input, select{
-    width:100%;
-    height:45px;
-    padding:0 12px;
-    margin:8px 0;
-    border-radius:12px;
-    border:none;
-    background:rgba(255,255,255,0.08);
-    color:white;
-    box-sizing:border-box;
+
+/* =========================================================
+   INPUT ICON
+========================================================= */
+
+.input-icon {
+
+    position: absolute;
+
+    left: 14px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: #777;
+
+    font-size: 13px;
+
+    pointer-events: none;
+
+    transition: 0.3s;
 }
 
-select{
-    appearance:none;
-    -webkit-appearance:none;
-    -moz-appearance:none;
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+input,
+select {
+
+    width: 100%;
+
+    height: 44px;
+
+    padding:
+        0 42px;
+
+    border-radius: 11px;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.10);
+
+    outline: none;
+
+    background:
+        rgba(255,255,255,0.055);
+
+    color: white;
+
+    font-family:
+        'Poppins',
+        sans-serif;
+
+    font-size: 12px;
+
+    transition:
+        0.3s ease;
 }
 
-select option{
-    background:#111;
-    color:white;
+
+input::placeholder {
+
+    color: #626262;
 }
 
-/* ====== BUTTON ====== */
-button{
-    width:100%;
-    padding:12px;
-    background:gold;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    font-weight:600;
+
+input:hover,
+select:hover {
+
+    border-color:
+        rgba(255,215,0,0.25);
+
+    background:
+        rgba(255,255,255,0.07);
 }
 
-button:hover{
-    background:#e6c200;
-    box-shadow:0 0 15px gold;
+
+input:focus,
+select:focus {
+
+    border-color:
+        rgba(255,215,0,0.65);
+
+    background:
+        rgba(255,215,0,0.035);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(255,215,0,0.06),
+
+        0 0 20px
+        rgba(255,215,0,0.05);
 }
 
-/* ====== PASSWORD STRENGTH ====== */
-#strength{
-    font-size:12px;
-    text-align:left;
-    margin-top:-6px;
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+select {
+
+    appearance: none;
+
+    -webkit-appearance: none;
+
+    -moz-appearance: none;
+
+    padding-right: 42px;
+
+    cursor: pointer;
 }
+
+
+select option {
+
+    background: #111;
+
+    color: white;
+}
+
+
+/* =========================================================
+   SELECT ARROW
+========================================================= */
+
+.select-arrow {
+
+    position: absolute;
+
+    right: 14px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    color: #777;
+
+    pointer-events: none;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PASSWORD EYE
+========================================================= */
+
+.password-toggle {
+
+    position: absolute;
+
+    right: 10px;
+
+    top: 50%;
+
+    transform:
+        translateY(-50%);
+
+    border: none;
+
+    background: transparent;
+
+    color: #777;
+
+    width: auto;
+
+    padding: 5px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    transition: 0.3s;
+}
+
+
+.password-toggle:hover {
+
+    color: #ffd700;
+
+    background: transparent;
+
+    box-shadow: none;
+
+    transform:
+        translateY(-50%);
+}
+
+
+/* =========================================================
+   PASSWORD STRENGTH
+========================================================= */
+
+.password-strength {
+
+    margin-top: 7px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 10px;
+
+    color: #666;
+}
+
+
+.strength-bars {
+
+    display: flex;
+
+    gap: 3px;
+
+    flex: 1;
+}
+
+
+.strength-bar {
+
+    height: 3px;
+
+    flex: 1;
+
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.08);
+
+    transition: 0.3s;
+}
+
+
+#strengthText {
+
+    min-width: 65px;
+
+    text-align: right;
+}
+
+
+/* =========================================================
+   SIGNUP BUTTON
+========================================================= */
+
+.signup-button {
+
+    position: relative;
+
+    width: 100%;
+
+    height: 45px;
+
+    margin-top: 4px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffd700,
+            #c9a227
+        );
+
+    color: #111;
+
+    font-family:
+        'Poppins',
+        sans-serif;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 25px
+        rgba(255,215,0,0.15);
+
+    transition:
+        0.3s ease;
+}
+
+
+.signup-button::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+
+    left: -100%;
+
+    width: 60%;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.4),
+            transparent
+        );
+
+    transform:
+        skewX(-20deg);
+
+    transition:
+        0.6s ease;
+}
+
+
+.signup-button:hover {
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 12px 32px
+        rgba(255,215,0,0.28);
+
+    filter:
+        brightness(1.06);
+}
+
+
+.signup-button:hover::before {
+
+    left: 130%;
+}
+
+
+.signup-button:active {
+
+    transform:
+        translateY(0);
+}
+
+
+.signup-button i {
+
+    margin-right: 7px;
+}
+
+
+/* =========================================================
+   ACCOUNT LINKS
+========================================================= */
+
+.account-links {
+
+    text-align: center;
+
+    font-size: 12px;
+
+    color: #888;
+
+    line-height: 1.7;
+
+    margin-top: 17px;
+}
+
+
+.account-links a {
+
+    color: #ffd700;
+
+    text-decoration: none;
+
+    transition: 0.3s;
+}
+
+
+.account-links a:hover {
+
+    color: white;
+
+    text-shadow:
+        0 0 10px
+        rgba(255,215,0,0.5);
+}
+
+
+.login-link {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   SECURITY NOTE
+========================================================= */
+
+.security-note {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 9px;
+
+    margin-top: 15px;
+
+    padding:
+        9px 11px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(255,255,255,0.035);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.055);
+
+    color: #707070;
+
+    font-size: 10px;
+
+    line-height: 1.55;
+}
+
+
+.security-note i {
+
+    color: #b69b28;
+
+    margin-top: 2px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    body {
+
+        cursor: auto;
+    }
+
+    .cursor {
+
+        display: none;
+    }
+
+    .signup-wrapper {
+
+        max-width: 430px;
+
+        padding:
+            20px 15px 35px;
+    }
+
+    .brand {
+
+        margin-bottom: 12px;
+    }
+
+    .brand-logo {
+
+        width: 95px;
+        height: 95px;
+    }
+
+    .brand-title {
+
+        font-size: 23px;
+    }
+
+    .brand-subtitle {
+
+        font-size: 11px;
+    }
+
+    .signup-card {
+
+        padding:
+            22px 18px;
+
+        border-radius: 18px;
+    }
+
+    .card-header {
+
+        margin-bottom: 17px;
+    }
+
+    .form-group {
+
+        margin-bottom: 13px;
+    }
+}
+
+
+/* =========================================================
+   SMALL DEVICES
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .signup-wrapper {
+
+        padding:
+            15px 10px 30px;
+    }
+
+    .brand-logo {
+
+        width: 85px;
+        height: 85px;
+    }
+
+    .signup-card {
+
+        padding:
+            19px 15px;
+    }
+
+    .brand-title {
+
+        font-size: 21px;
+    }
+
+    .card-header h2 {
+
+        font-size: 19px;
+    }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            0.01ms !important;
+    }
+}
+
 </style>
+
 </head>
+
 
 <body>
 
-<!-- BACKGROUND & CURSOR -->
+
+<!-- =========================================================
+     THREE.JS BACKGROUND
+========================================================= -->
+
 <div id="bg"></div>
+
+
+<!-- =========================================================
+     CURSOR TRAIL
+========================================================= -->
+
 <canvas id="trailCanvas"></canvas>
-<div class="cursor" id="cursor"></div>
 
-<!-- SIGNUP WRAPPER -->
-<div class="signup-wrapper">
-    <!-- LOGO -->
-    <img src="{{ url_for('static', filename='logo.png') }}" class="signup-logo">
 
-    <!-- FORM BOX -->
-    <div class="signup-box">
-        <p style="color: gold;font-size:larger;">Signup</p>
+<!-- =========================================================
+     CUSTOM CURSOR
+========================================================= -->
+
+<div
+    class="cursor"
+    id="cursor">
+</div>
+
+
+<!-- =========================================================
+     FLOATING ORBS
+========================================================= -->
+
+<div class="orb orb-one"></div>
+
+<div class="orb orb-two"></div>
+
+
+<!-- =========================================================
+     SIGNUP WRAPPER
+========================================================= -->
+
+<main
+    class="signup-wrapper"
+    id="signupWrapper">
+
+
+    <!-- =====================================================
+         BRAND
+    ====================================================== -->
+
+    <div class="brand">
+
+        <img
+            class="brand-logo"
+            src="{{ url_for('static', filename='logo1.png') }}"
+            alt="Dhanvantri Logo"
+        >
+
+        <h1 class="brand-title">
+            Dhanvantri AI
+        </h1>
+
+        <p class="brand-subtitle">
+            Your Conscious Health Companion
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIGNUP CARD
+    ====================================================== -->
+
+    <section class="signup-card">
+
+
+        <!-- HEADER -->
+
+        <div class="card-header">
+
+            <h2>
+                Create Your Account
+            </h2>
+
+            <p>
+                Begin your wellness journey with Dhanvantri.
+            </p>
+
+        </div>
+
+
+        <!-- ERROR -->
 
         {% if error %}
-        <p class="error">{{error}}</p>
+
+        <div class="error">
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+                {{ error }}
+            </span>
+
+        </div>
+
         {% endif %}
 
-        <form method="POST">
-            <input type="text" name="username" placeholder="👤 Username" required>
-            <input type="email" name="email" placeholder="📧 Email Address" required>
-            <div style="position:relative;">
-    <input type="password" id="password" name="password" placeholder="🔒 Password" required>
 
-    <i class="fa-solid fa-eye"
-   id="eyeIcon"
-   onclick="togglePassword()"
-   style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:gold;">
-</i>
-</div>
+        <!-- =================================================
+             FORM
+        ================================================== -->
 
-<div id="strength"></div>
-            <script>
-function togglePassword(){
-    let pass = document.getElementById("password");
-    let icon = document.getElementById("eyeIcon");
+        <form
+            method="POST"
+            action="{{ url_for('signup') }}"
+            id="signupForm"
+        >
 
-    if(pass.type === "password"){
-        pass.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-    } else {
-        pass.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-    }
-}
-</script>
 
-<div id="strength"></div>
-            <div id="strength"></div>
-            <input type="number" name="age" placeholder="🎂 Age" min="1" max="120" required>
-            <select name="gender" required>
-                <option value="">Select Gender</option>
-                <option value="male">👨 Male</option>
-                <option value="female">👩 Female</option>
-                <option value="other">⚧ Other</option>
-            </select>
-            <button type="submit">Signup</button>
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="username"
+                >
+
+                    <i class="fa-solid fa-user"></i>
+
+                    Username
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        required
+                    >
+
+                    <i
+                        class="fa-solid fa-user input-icon">
+                    </i>
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="email"
+                >
+
+                    <i class="fa-solid fa-envelope"></i>
+
+                    Email Address
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <i
+                        class="fa-solid fa-envelope input-icon">
+                    </i>
+
+                </div>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="password"
+                >
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    Password
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Create a secure password"
+                        autocomplete="new-password"
+                        required
+                    >
+
+                    <i
+                        class="fa-solid fa-lock input-icon">
+                    </i>
+
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        id="passwordToggle"
+                        aria-label="Show password"
+                    >
+
+                        <i
+                            class="fa-solid fa-eye"
+                            id="eyeIcon">
+                        </i>
+
+                    </button>
+
+                </div>
+
+
+                <!-- PASSWORD STRENGTH -->
+
+                <div class="password-strength">
+
+                    <div class="strength-bars">
+
+                        <span
+                            class="strength-bar"
+                            id="bar1">
+                        </span>
+
+                        <span
+                            class="strength-bar"
+                            id="bar2">
+                        </span>
+
+                        <span
+                            class="strength-bar"
+                            id="bar3">
+                        </span>
+
+                        <span
+                            class="strength-bar"
+                            id="bar4">
+                        </span>
+
+                    </div>
+
+                    <span id="strengthText">
+                        Password
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- AGE -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="age"
+                >
+
+                    <i class="fa-solid fa-cake-candles"></i>
+
+                    Age
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        placeholder="Enter your age"
+                        min="1"
+                        max="120"
+                        required
+                    >
+
+                    <i
+                        class="fa-solid fa-cake-candles input-icon">
+                    </i>
+
+                </div>
+
+            </div>
+
+
+            <!-- GENDER -->
+
+            <div class="form-group">
+
+                <label
+                    class="form-label"
+                    for="gender"
+                >
+
+                    <i class="fa-solid fa-venus-mars"></i>
+
+                    Gender
+
+                </label>
+
+
+                <div class="input-wrapper">
+
+                    <select
+                        id="gender"
+                        name="gender"
+                        required
+                    >
+
+                        <option value="">
+                            Select your gender
+                        </option>
+
+                        <option value="male">
+                            Male
+                        </option>
+
+                        <option value="female">
+                            Female
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+
+                    <i
+                        class="fa-solid fa-venus-mars input-icon">
+                    </i>
+
+
+                    <i
+                        class="fa-solid fa-chevron-down select-arrow">
+                    </i>
+
+                </div>
+
+            </div>
+
+
+            <!-- SIGNUP BUTTON -->
+
+            <button
+                type="submit"
+                class="signup-button"
+                id="signupButton"
+            >
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Create Account
+
+            </button>
+
+
         </form>
 
-        <p>Already have account?<br>
-        <a href="/login" style="color:gold">Login</a></p>
-    </div>
-</div>
 
-<!-- ====== PASSWORD STRENGTH SCRIPT ====== -->
+        <!-- ACCOUNT LINK -->
+
+        <div class="account-links">
+
+            <div>
+                Already have an account?
+            </div>
+
+            <a
+                href="/login"
+                class="login-link"
+            >
+
+                <i class="fa-solid fa-right-to-bracket"></i>
+
+                Sign In
+
+            </a>
+
+        </div>
+
+
+        <!-- SECURITY -->
+
+        <div class="security-note">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+                Your information is handled securely.
+                Dhanvantri AI supports your wellness journey
+                and does not replace professional medical care.
+            </span>
+
+        </div>
+
+
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
 <script>
-const password=document.getElementById("password");
-const strength=document.getElementById("strength");
 
-password.addEventListener("input",function(){
-    let val=password.value;
-    if(val.length<6){
-        strength.innerHTML="Weak password";
-        strength.style.color="red";
-    }
-    else if(val.match(/[A-Z]/) && val.match(/[0-9]/)){
-        strength.innerHTML="Strong password";
-        strength.style.color="gold";
-    }
-    else{
-        strength.innerHTML="Medium password";
-        strength.style.color="orange";
-    }
-});
-</script>
 
-<!-- ====== CURSOR TRAIL SCRIPT ====== -->
-<script>
-const cursor=document.getElementById("cursor");
-const canvas=document.getElementById("trailCanvas");
-const ctx=canvas.getContext("2d");
+/* =========================================================
+   PAGE APPEAR
+========================================================= */
 
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
+window.addEventListener("load", function () {
 
-let stars=[];
+    document
+        .getElementById("signupWrapper")
+        .classList.add("show");
 
-window.addEventListener("mousemove", e => {
-    cursor.style.left=e.clientX+"px";
-    cursor.style.top=e.clientY+"px";
-    stars.push({x:e.clientX, y:e.clientY, size:2, life:40});
 });
 
-function animateStars(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    for(let i=0;i<stars.length;i++){
-        let s=stars[i];
-        ctx.beginPath();
-        ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,215,0,${s.life/40})`;
-        ctx.fill();
-        s.size*=0.95;
-        s.life--;
-        if(s.life<=0){
-            stars.splice(i,1);
+
+/* =========================================================
+   CUSTOM CURSOR
+========================================================= */
+
+const cursor =
+    document.getElementById("cursor");
+
+
+window.addEventListener(
+    "mousemove",
+    function (event) {
+
+        cursor.style.left =
+            event.clientX + "px";
+
+        cursor.style.top =
+            event.clientY + "px";
+
+    }
+);
+
+
+/* =========================================================
+   CURSOR TRAIL
+========================================================= */
+
+const trailCanvas =
+    document.getElementById("trailCanvas");
+
+const trailContext =
+    trailCanvas.getContext("2d");
+
+
+function resizeTrailCanvas() {
+
+    trailCanvas.width =
+        window.innerWidth;
+
+    trailCanvas.height =
+        window.innerHeight;
+
+}
+
+
+resizeTrailCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeTrailCanvas
+);
+
+
+let trailParticles = [];
+
+
+window.addEventListener(
+    "mousemove",
+    function (event) {
+
+        trailParticles.push({
+
+            x: event.clientX,
+
+            y: event.clientY,
+
+            size: 2,
+
+            life: 35
+
+        });
+
+    }
+);
+
+
+function animateTrail() {
+
+    trailContext.clearRect(
+        0,
+        0,
+        trailCanvas.width,
+        trailCanvas.height
+    );
+
+
+    for (
+        let i = 0;
+        i < trailParticles.length;
+        i++
+    ) {
+
+        const particle =
+            trailParticles[i];
+
+
+        trailContext.beginPath();
+
+
+        trailContext.arc(
+            particle.x,
+            particle.y,
+            particle.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        trailContext.fillStyle =
+            `rgba(
+                255,
+                215,
+                0,
+                ${particle.life / 35}
+            )`;
+
+
+        trailContext.fill();
+
+
+        particle.size *= 0.94;
+
+        particle.life--;
+
+
+        if (particle.life <= 0) {
+
+            trailParticles.splice(
+                i,
+                1
+            );
+
             i--;
+
         }
+
     }
-    requestAnimationFrame(animateStars);
+
+
+    requestAnimationFrame(
+        animateTrail
+    );
+
 }
 
-animateStars();
+
+animateTrail();
+
+
+/* =========================================================
+   THREE.JS BACKGROUND
+========================================================= */
+
+const scene =
+    new THREE.Scene();
+
+
+const camera =
+    new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth /
+        window.innerHeight,
+        0.1,
+        1000
+    );
+
+
+const renderer =
+    new THREE.WebGLRenderer({
+
+        alpha: true,
+
+        antialias: true
+
+    });
+
+
+renderer.setPixelRatio(
+    Math.min(
+        window.devicePixelRatio,
+        2
+    )
+);
+
+
+renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+);
+
+
+document
+    .getElementById("bg")
+    .appendChild(
+        renderer.domElement
+    );
+
+
+camera.position.z = 7;
+
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+const geometry =
+    new THREE.BufferGeometry();
+
+
+const particleCount = 1600;
+
+
+const positions =
+    new Float32Array(
+        particleCount * 3
+    );
+
+
+for (
+    let i = 0;
+    i < particleCount * 3;
+    i++
+) {
+
+    positions[i] =
+        (Math.random() - 0.5) * 22;
+
+}
+
+
+geometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(
+        positions,
+        3
+    )
+);
+
+
+const material =
+    new THREE.PointsMaterial({
+
+        color: 0xffd700,
+
+        size: 0.018,
+
+        transparent: true,
+
+        opacity: 0.7
+
+    });
+
+
+const particleSystem =
+    new THREE.Points(
+        geometry,
+        material
+    );
+
+
+scene.add(
+    particleSystem
+);
+
+
+/* =========================================================
+   BACKGROUND ANIMATION
+========================================================= */
+
+function animateBackground() {
+
+    requestAnimationFrame(
+        animateBackground
+    );
+
+
+    particleSystem.rotation.y +=
+        0.00055;
+
+
+    particleSystem.rotation.x +=
+        0.00008;
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+animateBackground();
+
+
+/* =========================================================
+   THREE.JS RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        camera.aspect =
+            window.innerWidth /
+            window.innerHeight;
+
+
+        camera.updateProjectionMatrix();
+
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+    }
+);
+
+
+/* =========================================================
+   PASSWORD TOGGLE
+========================================================= */
+
+const password =
+    document.getElementById("password");
+
+
+const passwordToggle =
+    document.getElementById(
+        "passwordToggle"
+    );
+
+
+const eyeIcon =
+    document.getElementById(
+        "eyeIcon"
+    );
+
+
+passwordToggle.addEventListener(
+    "click",
+    function () {
+
+        if (
+            password.type ===
+            "password"
+        ) {
+
+            password.type =
+                "text";
+
+
+            eyeIcon.classList.remove(
+                "fa-eye"
+            );
+
+
+            eyeIcon.classList.add(
+                "fa-eye-slash"
+            );
+
+
+            passwordToggle.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
+        }
+
+        else {
+
+            password.type =
+                "password";
+
+
+            eyeIcon.classList.remove(
+                "fa-eye-slash"
+            );
+
+
+            eyeIcon.classList.add(
+                "fa-eye"
+            );
+
+
+            passwordToggle.setAttribute(
+                "aria-label",
+                "Show password"
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   PASSWORD STRENGTH
+========================================================= */
+
+const strengthText =
+    document.getElementById(
+        "strengthText"
+    );
+
+
+const bars = [
+
+    document.getElementById("bar1"),
+
+    document.getElementById("bar2"),
+
+    document.getElementById("bar3"),
+
+    document.getElementById("bar4")
+
+];
+
+
+password.addEventListener(
+    "input",
+    function () {
+
+        const value =
+            password.value;
+
+        let score = 0;
+
+
+        if (value.length >= 6)
+            score++;
+
+        if (value.length >= 10)
+            score++;
+
+        if (/[A-Z]/.test(value))
+            score++;
+
+        if (
+            /[0-9]/.test(value) &&
+            /[^A-Za-z0-9]/.test(value)
+        )
+            score++;
+
+
+        bars.forEach(
+            bar => {
+
+                bar.style.background =
+                    "rgba(255,255,255,0.08)";
+
+            }
+        );
+
+
+        if (value.length === 0) {
+
+            strengthText.textContent =
+                "Password";
+
+            strengthText.style.color =
+                "#666";
+
+            return;
+
+        }
+
+
+        if (score <= 1) {
+
+            strengthText.textContent =
+                "Weak";
+
+            strengthText.style.color =
+                "#ff5c5c";
+
+
+            bars[0].style.background =
+                "#ff5c5c";
+
+        }
+
+
+        else if (score === 2) {
+
+            strengthText.textContent =
+                "Fair";
+
+            strengthText.style.color =
+                "#ffae42";
+
+
+            bars[0].style.background =
+                "#ffae42";
+
+            bars[1].style.background =
+                "#ffae42";
+
+        }
+
+
+        else if (score === 3) {
+
+            strengthText.textContent =
+                "Good";
+
+            strengthText.style.color =
+                "#ffd700";
+
+
+            bars[0].style.background =
+                "#ffd700";
+
+            bars[1].style.background =
+                "#ffd700";
+
+            bars[2].style.background =
+                "#ffd700";
+
+        }
+
+
+        else {
+
+            strengthText.textContent =
+                "Strong";
+
+            strengthText.style.color =
+                "#6ee77b";
+
+
+            bars.forEach(
+                bar => {
+
+                    bar.style.background =
+                        "#6ee77b";
+
+                }
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   FORM SUBMIT FEEDBACK
+========================================================= */
+
+const signupForm =
+    document.getElementById(
+        "signupForm"
+    );
+
+
+const signupButton =
+    document.getElementById(
+        "signupButton"
+    );
+
+
+signupForm.addEventListener(
+    "submit",
+    function () {
+
+        signupButton.disabled =
+            true;
+
+
+        signupButton.innerHTML =
+            `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Creating Account...
+            `;
+
+
+        signupButton.style.opacity =
+            "0.8";
+
+    }
+);
+
 </script>
 
-<!-- ====== THREE JS STAR BACKGROUND ====== -->
-<script>
-let scene=new THREE.Scene();
-let camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-let renderer=new THREE.WebGLRenderer({alpha:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.getElementById("bg").appendChild(renderer.domElement);
-
-camera.position.z=8;
-
-const geometry=new THREE.BufferGeometry();
-const vertices=[];
-for(let i=0;i<1500;i++){
-    vertices.push((Math.random()-0.5)*20,(Math.random()-0.5)*20,(Math.random()-0.5)*20);
-}
-geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
-const material=new THREE.PointsMaterial({color:0xFFD700,size:0.02});
-const starsMesh=new THREE.Points(geometry,material);
-scene.add(starsMesh);
-
-function animate(){
-    requestAnimationFrame(animate);
-    starsMesh.rotation.y+=0.0008;
-    renderer.render(scene,camera);
-}
-animate();
-function togglePassword(){
-    let pass = document.getElementById("password");
-    let icon = document.getElementById("eyeIcon");
-
-    if(pass.type === "password"){
-        pass.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-    } else {
-        pass.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-    }
-}
-</script>
 </body>
+
 </html>

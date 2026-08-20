@@ -1,260 +1,923 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Dhanvantri Login</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhanvantri AI | Login</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-<link rel="icon" type="image/png" href="{{ url_for('static', filename='logo1.png') }}">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 
-<style>
-/* ===== BODY ===== */
-body {
-    margin:0;
-    font-family:'Poppins',sans-serif;
-    background:#0b0b0b;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    overflow:hidden;
-    flex-direction:column;
-}
+    <link rel="icon" type="image/png"
+          href="{{ url_for('static', filename='logo1.png') }}">
 
-/* BACKGROUND & PARTICLES */
-#bg{position:fixed;width:100%;height:100%;z-index:-2;}
-#trailCanvas{position:fixed;top:0;left:0;pointer-events:none;z-index:-1;}
-.cursor{
-    width:10px;height:10px;background:gold;border-radius:50%;
-    position:fixed;pointer-events:none;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 10px gold,0 0 20px gold;
-}
+    <style>
+        * { box-sizing: border-box; }
 
-/* SPLASH LOGO & TEXT */
-#splash {
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:black;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-#splash img {
-    width:200px;
-    transform: scale(0.5);
-    opacity:0;
-    animation: logoExpand 2s ease forwards;
-    filter: drop-shadow(0 0 5px gold) drop-shadow(0 0 15px gold);
-}
-#splash #splash-text {
-    color: gold;
-    font-size:28px;
-    opacity:0;
-    margin-top:20px;
-    animation: textFade 1s ease forwards;
-    animation-delay: 2s;
-}
+        html {
+            width: 100%;
+            min-height: 100%;
+        }
 
-/* ===== ANIMATIONS ===== */
-@keyframes logoExpand {
-    0% { transform: scale(0.5); opacity:0; }
-    100% { transform: scale(1); opacity:1; }
-}
-@keyframes textFade {
-    to { opacity:1; }
-}
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background: #080808;
+            color: white;
+            overflow-x: hidden;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            cursor: none;
+        }
 
-/* ===== LOGIN WRAPPER ===== */
-.login-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    opacity:0;
-    transition: opacity 1s ease;
-}
+        #bg {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -5;
+            overflow: hidden;
+        }
 
-/* LOGO IN LOGIN FORM */
-.login-logo {
-    width: 225px;
-    display: block;
-}
+        #trailCanvas {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9997;
+        }
 
-/* LOGIN BOX */
-.login-box{
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(15px);
-    padding:30px;
-    border-radius:18px;
-    width:340px;
-    text-align:center;
-    box-shadow:0 0 30px rgba(255,215,0,0.25);
-}
-.login-box p { margin:5px 0; }
-.error{ color:red; font-size:13px; margin-bottom:10px; }
+        .cursor {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ffd700;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                0 0 8px #ffd700,
+                0 0 18px rgba(255,215,0,0.8),
+                0 0 30px rgba(255,215,0,0.35);
+        }
 
-input{
-    width:100%; height:45px; padding:0 12px; margin:8px 0;
-    border-radius:12px; border:none;
-    background:rgba(255,255,255,0.08); color:white; box-sizing:border-box;
-}
-/* Keep background behind everything */
-#bg{position:fixed;width:100%;height:100%;z-index:-2;}
-#trailCanvas{position:fixed;top:0;left:0;pointer-events:none;z-index:-1;}
-#splash{
-    position:fixed;
-    width:100%;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    z-index:10; /* in front of stars but below cursor */
-    background: transparent; /* allow glitter background to show */
-}
-#splash img{
-    filter: drop-shadow(0 0 10px gold) drop-shadow(0 0 25px gold);
-    width: 300px;
-}
-button{
-    width:100%; padding:12px; background:gold; border:none;
-    border-radius:12px; cursor:pointer; font-weight:600;
-}
-button:hover{ background:#e6c200; box-shadow:0 0 15px gold; }
-</style>
+        #splash {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(255,215,0,0.05), #050505 70%);
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #splash.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0.65);
+            animation: splashLogo 1.8s cubic-bezier(.16,1,.3,1) forwards;
+            filter:
+                drop-shadow(0 0 10px rgba(255,215,0,0.7))
+                drop-shadow(0 0 30px rgba(255,215,0,0.3));
+        }
+
+        .splash-title {
+            margin-top: 18px;
+            color: #ffd700;
+            font-size: 25px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: splashText 1s ease 1.4s forwards;
+        }
+
+        .splash-subtitle {
+            margin-top: 7px;
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: splashText 1s ease 1.8s forwards;
+        }
+
+        @keyframes splashLogo {
+            0% { opacity: 0; transform: scale(0.55) rotate(-8deg); }
+            60% { opacity: 1; transform: scale(1.05) rotate(2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        @keyframes splashText {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 450px;
+            padding: 28px 20px 45px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.9s ease, transform 0.9s ease;
+            z-index: 10;
+        }
+
+        .login-wrapper.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .brand-logo {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+            filter:
+                drop-shadow(0 0 10px rgba(255,215,0,0.5))
+                drop-shadow(0 0 25px rgba(255,215,0,0.2));
+            margin-bottom: 4px;
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 27px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            margin: 4px 0 0;
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 0.4px;
+        }
+
+        .login-card {
+            position: relative;
+            padding: 25px;
+            border-radius: 22px;
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,0.085),
+                rgba(255,255,255,0.035)
+            );
+            border: 1px solid rgba(255,255,255,0.10);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            box-shadow:
+                0 25px 70px rgba(0,0,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 12%;
+            width: 76%;
+            height: 1px;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,215,0,0.8),
+                transparent
+            );
+        }
+
+        .login-card::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            top: -100px;
+            right: -90px;
+            border-radius: 50%;
+            background: rgba(255,215,0,0.07);
+            filter: blur(20px);
+            pointer-events: none;
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 21px;
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .card-header p {
+            margin: 5px 0 0;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .error {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background: rgba(255,70,70,0.08);
+            border: 1px solid rgba(255,80,80,0.22);
+            color: #ff8585;
+            font-size: 12px;
+        }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 6px;
+            color: #d7d7d7;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .form-label i {
+            color: #d9b929;
+            width: 15px;
+            text-align: center;
+        }
+
+        .input-wrapper { position: relative; }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 13px;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        input {
+            width: 100%;
+            height: 44px;
+            padding: 0 42px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,0.10);
+            outline: none;
+            background: rgba(255,255,255,0.055);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            transition: 0.3s ease;
+        }
+
+        input::placeholder { color: #626262; }
+
+        input:hover {
+            border-color: rgba(255,215,0,0.25);
+            background: rgba(255,255,255,0.07);
+        }
+
+        input:focus {
+            border-color: rgba(255,215,0,0.65);
+            background: rgba(255,215,0,0.035);
+            box-shadow:
+                0 0 0 3px rgba(255,215,0,0.06),
+                0 0 20px rgba(255,215,0,0.05);
+        }
+
+        input:focus + .input-icon { color: #ffd700; }
+
+        .password-toggle {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #777;
+            width: auto;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: 0.3s;
+        }
+
+        .password-toggle:hover {
+            color: #ffd700;
+            background: transparent;
+            box-shadow: none;
+            transform: translateY(-50%);
+        }
+
+        .login-button {
+            position: relative;
+            width: 100%;
+            height: 45px;
+            margin-top: 4px;
+            border: none;
+            border-radius: 11px;
+            background: linear-gradient(135deg, #ffd700, #c9a227);
+            color: #111;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(255,215,0,0.15);
+            transition: 0.3s ease;
+        }
+
+        .login-button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.4),
+                transparent
+            );
+            transform: skewX(-20deg);
+            transition: 0.6s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(255,215,0,0.28);
+            filter: brightness(1.06);
+        }
+
+        .login-button:hover::before { left: 130%; }
+        .login-button:active { transform: translateY(0); }
+        .login-button i { margin-right: 7px; }
+
+        .account-links {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            line-height: 1.7;
+        }
+
+        .account-links a {
+            color: #ffd700;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .account-links a:hover {
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .signup-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            margin-top: 15px;
+            padding: 9px 11px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.055);
+            color: #707070;
+            font-size: 10px;
+            line-height: 1.55;
+        }
+
+        .security-note i {
+            color: #b69b28;
+            margin-top: 2px;
+        }
+
+        .orb {
+            position: fixed;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(255,215,0,0.07),
+                transparent 70%
+            );
+            pointer-events: none;
+            z-index: -1;
+            animation: floatOrb 8s ease-in-out infinite;
+        }
+
+        .orb-one { left: -120px; top: 15%; }
+        .orb-two {
+            right: -120px;
+            bottom: 10%;
+            animation-delay: -4s;
+        }
+
+        @keyframes floatOrb {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                cursor: auto;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            .cursor { display: none; }
+
+            .login-wrapper {
+                max-width: 430px;
+                padding: 20px 15px 35px;
+            }
+
+            .brand { margin-bottom: 12px; }
+
+            .brand-logo {
+                width: 120px;
+    height: 120px;
+                margin-bottom: 2px;
+            }
+
+            .brand-title { font-size: 23px; }
+            .brand-subtitle { font-size: 11px; }
+
+            .login-card {
+                padding: 22px 18px;
+                border-radius: 18px;
+            }
+
+            .card-header { margin-bottom: 17px; }
+            .form-group { margin-bottom: 13px; }
+            input { height: 44px; }
+            .login-button { height: 45px; }
+
+            .splash-logo {
+                width: 145px;
+                height: 145px;
+            }
+
+            .splash-title { font-size: 21px; }
+        }
+
+        @media (max-width: 380px) {
+            .login-wrapper { padding: 15px 10px 30px; }
+
+            .brand-logo {
+                width: 85px;
+                height: 85px;
+            }
+
+            .login-card { padding: 19px 15px; }
+            .brand-title { font-size: 21px; }
+            .brand-subtitle { font-size: 10px; }
+            .card-header h2 { font-size: 19px; }
+            .card-header p { font-size: 11px; }
+            input { height: 42px; }
+            .login-button { height: 43px; }
+        }
+
+        @media (min-width: 601px) and (max-height: 750px) {
+            .login-wrapper {
+                padding-top: 15px;
+                padding-bottom: 30px;
+            }
+
+            .brand { margin-bottom: 10px; }
+
+            .brand-logo {
+                width: 105px;
+                height: 105px;
+            }
+
+            .login-card { padding: 22px; }
+            .card-header { margin-bottom: 16px; }
+            .form-group { margin-bottom: 12px; }
+            .security-note { margin-top: 12px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- BACKGROUND & CURSOR -->
-<div id="bg"></div>
-<canvas id="trailCanvas"></canvas>
-<div class="cursor" id="cursor"></div>
+    <div id="bg"></div>
+    <canvas id="trailCanvas"></canvas>
 
-<!-- SPLASH SCREEN -->
-<div id="splash">
-    <img src="{{ url_for('static', filename='favicon.png') }}" alt="Logo">
-    <div id="splash-text">Your Daily Health Companion</div>
-</div>
+    <div class="cursor" id="cursor"></div>
 
-<!-- BACKGROUND & CURSOR -->
-<div id="bg"></div>
-<canvas id="trailCanvas"></canvas>
-<div class="cursor" id="cursor"></div>
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
 
-<!-- LOGIN WRAPPER -->
-<div class="login-wrapper">
-    <img src="{{ url_for('static', filename='logo.png') }}" class="login-logo">
-    <div class="login-box">
-        <p style="color: gold;font-size:larger;">Login</p>
-        {% if error %}
-        <p class="error">{{error}}</p>
-        {% endif %}
-        <form method="POST">
-            <input type="text" name="username" placeholder="👤 Username" required>
-            <input type="email" name="email" placeholder="📧 Email Address" required>
-            <div style="position:relative;">
-    <input type="password" id="password" name="password" placeholder="🔒 Password" required>
-
-    <i class="fa-solid fa-eye"
-   id="eyeIcon"
-   onclick="togglePassword()"
-   style="position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:gold;">
-</i>
-</div>
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account?<br>
-        <a href="/signup" style="color:gold">🌱 Create Account</a></p>
-        <p>
-    <a href="/forgot-password" style="color:gold;">Forgot Password?</a>
-</p>
+    <div id="splash">
+        <img
+            class="splash-logo"
+            src="{{ url_for('static', filename='logo1.png') }}"
+            alt="Dhanvantri Logo"
+        >
+        <div class="splash-title">Dhanvantri AI</div>
+        <div class="splash-subtitle">Your Daily Health Companion</div>
     </div>
-</div>
 
-<script>
-// SPLASH TO LOGIN TRANSITION
-window.addEventListener("load", () => {
-    // logo animation 2s + text animation 1s = 3s
-    setTimeout(() => {
-        document.getElementById("splash").style.display = "none";
-        document.querySelector(".login-wrapper").style.opacity = "1";
-    }, 3000);
-});
+    <main class="login-wrapper" id="loginWrapper">
 
-// CURSOR TRAIL
-const cursor=document.getElementById("cursor");
-const canvas=document.getElementById("trailCanvas");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-let stars=[];
-window.addEventListener("mousemove",e=>{
-    cursor.style.left=e.clientX+"px";
-    cursor.style.top=e.clientY+"px";
-    stars.push({x:e.clientX,y:e.clientY,size:2,life:40});
-});
-function animateStars(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    for(let i=0;i<stars.length;i++){
-        let s=stars[i];
-        ctx.beginPath();
-        ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,215,0,${s.life/40})`;
-        ctx.fill();
-        s.size*=0.95; s.life--;
-        if(s.life<=0){ stars.splice(i,1); i--; }
-    }
-    requestAnimationFrame(animateStars);
-}
-animateStars();
+        <div class="brand">
+            <img
+                class="brand-logo"
+                src="{{ url_for('static', filename='logo1.png') }}"
+                alt="Dhanvantri Logo"
+            >
 
-// THREE JS STAR BACKGROUND
-let scene=new THREE.Scene();
-let camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-let renderer=new THREE.WebGLRenderer({alpha:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-document.getElementById("bg").appendChild(renderer.domElement);
-camera.position.z=8;
+            <h1 class="brand-title">Dhanvantri AI</h1>
 
-const geometry=new THREE.BufferGeometry();
-const vertices=[];
-for(let i=0;i<1500;i++){
-    vertices.push((Math.random()-0.5)*20,(Math.random()-0.5)*20,(Math.random()-0.5)*20);
-}
-geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));
-const material=new THREE.PointsMaterial({color:0xFFD700,size:0.02});
-const starsMesh=new THREE.Points(geometry,material);
-scene.add(starsMesh);
+            <p class="brand-subtitle">
+                Your Conscious Health Companion
+            </p>
+        </div>
 
-function animate(){
-    requestAnimationFrame(animate);
-    starsMesh.rotation.y+=0.0008;
-    renderer.render(scene,camera);
-}
-animate();
-</script>
-<script>
-function togglePassword(){
-    let pass = document.getElementById("password");
-    let icon = document.getElementById("eyeIcon");
+        <section class="login-card">
 
-    if(pass.type === "password"){
-        pass.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-    } else {
-        pass.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-    }
-}
-</script>
+            <div class="card-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue your wellness journey.</p>
+            </div>
+
+            {% if error %}
+            <div class="error">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <form
+                method="POST"
+                action="{{ url_for('login') }}"
+                id="loginForm"
+            >
+
+                <div class="form-group">
+                    <label class="form-label" for="username">
+                        <i class="fa-solid fa-user"></i>
+                        Username
+                    </label>
+
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Enter your username"
+                            autocomplete="username"
+                            required
+                        >
+
+                        <i class="fa-solid fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">
+                        <i class="fa-solid fa-envelope"></i>
+                        Email Address
+                    </label>
+
+                    <div class="input-wrapper">
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">
+                        <i class="fa-solid fa-lock"></i>
+                        Password
+                    </label>
+
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <i class="fa-solid fa-lock input-icon"></i>
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="passwordToggle"
+                            aria-label="Show password"
+                        >
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    class="login-button"
+                    id="loginButton"
+                >
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    Sign In
+                </button>
+
+            </form>
+
+            <div class="account-links">
+
+                <div>Don't have an account?</div>
+
+                <a href="/signup" class="signup-link">
+                    <i class="fa-solid fa-user-plus"></i>
+                    Create Account
+                </a>
+
+                <div style="margin-top: 6px;">
+                    <a href="/forgot-password">
+                        <i class="fa-solid fa-key"></i>
+                        Forgot Password?
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="security-note">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>
+                    Your account information is handled securely.
+                    Dhanvantri AI is designed to support your wellness
+                    journey and does not replace professional medical care.
+                </span>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        /* Splash transition */
+        window.addEventListener("load", function () {
+            const splash = document.getElementById("splash");
+            const loginWrapper = document.getElementById("loginWrapper");
+
+            setTimeout(function () {
+                splash.classList.add("hidden");
+                loginWrapper.classList.add("show");
+            }, 3000);
+        });
+
+        /* Custom cursor */
+        const cursor = document.getElementById("cursor");
+
+        window.addEventListener("mousemove", function (event) {
+            cursor.style.left = event.clientX + "px";
+            cursor.style.top = event.clientY + "px";
+        });
+
+        /* Cursor trail */
+        const trailCanvas = document.getElementById("trailCanvas");
+        const trailContext = trailCanvas.getContext("2d");
+
+        function resizeTrailCanvas() {
+            trailCanvas.width = window.innerWidth;
+            trailCanvas.height = window.innerHeight;
+        }
+
+        resizeTrailCanvas();
+        window.addEventListener("resize", resizeTrailCanvas);
+
+        let trailParticles = [];
+
+        window.addEventListener("mousemove", function (event) {
+            trailParticles.push({
+                x: event.clientX,
+                y: event.clientY,
+                size: 2,
+                life: 35
+            });
+        });
+
+        function animateTrail() {
+            trailContext.clearRect(
+                0,
+                0,
+                trailCanvas.width,
+                trailCanvas.height
+            );
+
+            for (let i = 0; i < trailParticles.length; i++) {
+                const particle = trailParticles[i];
+
+                trailContext.beginPath();
+
+                trailContext.arc(
+                    particle.x,
+                    particle.y,
+                    particle.size,
+                    0,
+                    Math.PI * 2
+                );
+
+                trailContext.fillStyle =
+                    `rgba(255, 215, 0, ${particle.life / 35})`;
+
+                trailContext.fill();
+
+                particle.size *= 0.94;
+                particle.life--;
+
+                if (particle.life <= 0) {
+                    trailParticles.splice(i, 1);
+                    i--;
+                }
+            }
+
+            requestAnimationFrame(animateTrail);
+        }
+
+        animateTrail();
+
+        /* Three.js particle background */
+        const scene = new THREE.Scene();
+
+        const camera = new THREE.PerspectiveCamera(
+            70,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            1000
+        );
+
+        const renderer = new THREE.WebGLRenderer({
+            alpha: true,
+            antialias: true
+        });
+
+        renderer.setPixelRatio(
+            Math.min(window.devicePixelRatio, 2)
+        );
+
+        renderer.setSize(
+            window.innerWidth,
+            window.innerHeight
+        );
+
+        document.getElementById("bg").appendChild(renderer.domElement);
+
+        camera.position.z = 7;
+
+        const geometry = new THREE.BufferGeometry();
+        const particleCount = 1600;
+
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 22;
+        }
+
+        geometry.setAttribute(
+            "position",
+            new THREE.BufferAttribute(positions, 3)
+        );
+
+        const material = new THREE.PointsMaterial({
+            color: 0xffd700,
+            size: 0.02
+        });
+
+        const particleSystem = new THREE.Points(
+            geometry,
+            material
+        );
+
+        scene.add(particleSystem);
+
+        function animateBackground() {
+            requestAnimationFrame(animateBackground);
+
+            particleSystem.rotation.y += 0.00055;
+            particleSystem.rotation.x += 0.00008;
+
+            renderer.render(scene, camera);
+        }
+
+        animateBackground();
+
+        window.addEventListener("resize", function () {
+            camera.aspect =
+                window.innerWidth / window.innerHeight;
+
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+        });
+
+        /* Password toggle */
+        const password = document.getElementById("password");
+        const passwordToggle =
+            document.getElementById("passwordToggle");
+        const eyeIcon =
+            document.getElementById("eyeIcon");
+
+        passwordToggle.addEventListener("click", function () {
+            if (password.type === "password") {
+                password.type = "text";
+
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+
+                passwordToggle.setAttribute(
+                    "aria-label",
+                    "Hide password"
+                );
+            } else {
+                password.type = "password";
+
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+
+                passwordToggle.setAttribute(
+                    "aria-label",
+                    "Show password"
+                );
+            }
+        });
+
+        /* Form submit feedback */
+        const loginForm =
+            document.getElementById("loginForm");
+
+        const loginButton =
+            document.getElementById("loginButton");
+
+        loginForm.addEventListener("submit", function () {
+            loginButton.disabled = true;
+
+            loginButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Signing In...
+            `;
+
+            loginButton.style.opacity = "0.8";
+        });
+    </script>
 
 </body>
 </html>

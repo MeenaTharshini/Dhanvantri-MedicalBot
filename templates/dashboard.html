@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dhanvantri | Wellness Dashboard</title>
+
+    <!-- Main CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Favicon -->
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='logo1.png') }}">
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #080808;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+
+        /* =====================================================
+           BACKGROUND
+        ===================================================== */
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+
+            background:
+                radial-gradient(
+                    circle at 15% 15%,
+                    rgba(212,175,55,.08),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 20%,
+                    rgba(212,175,55,.06),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 50% 90%,
+                    rgba(212,175,55,.04),
+                    transparent 35%
+                ),
+                #080808;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+
+            background-image:
+                radial-gradient(
+                    rgba(212,175,55,.25) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+            opacity: .08;
+            pointer-events: none;
+        }
+
+
+        /* =====================================================
+           DASHBOARD
+        ===================================================== */
+
+        .dashboard {
+            width: 100%;
+            max-width: 1150px;
+
+            margin: auto;
+            padding: 28px;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 22px 24px;
+            margin-bottom: 18px;
+
+            border-radius: 18px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            border:
+                1px solid rgba(255,255,255,.07);
+
+            backdrop-filter:
+                blur(20px);
+
+            box-shadow:
+                0 15px 45px rgba(0,0,0,.25);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(244,211,94,.2),
+                    rgba(184,134,11,.08)
+                );
+
+            color: #d4af37;
+
+            border:
+                1px solid rgba(212,175,55,.18);
+        }
+
+        .header-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .header h1 {
+            margin: 0;
+
+            font-size: 21px;
+            font-weight: 600;
+
+            color: #ffffff;
+        }
+
+        .header p {
+            margin: 3px 0 0;
+
+            color: #777;
+            font-size: 11px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 10px 14px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(212,175,55,.09);
+
+            border:
+                1px solid rgba(212,175,55,.18);
+
+            color: #d8bd58;
+
+            font-size: 11px;
+            font-weight: 500;
+
+            transition: .25s;
+        }
+
+        .back-btn:hover {
+            background:
+                rgba(212,175,55,.18);
+
+            color: white;
+
+            transform: translateY(-1px);
+        }
+
+        .back-btn svg {
+            width: 15px;
+        }
+
+
+        /* =====================================================
+           SECTION
+        ===================================================== */
+
+        .section {
+            margin-bottom: 18px;
+
+            padding: 22px;
+
+            border-radius: 17px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            backdrop-filter:
+                blur(18px);
+
+            box-shadow:
+                0 12px 40px rgba(0,0,0,.18);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 18px;
+        }
+
+        .section-icon {
+            width: 35px;
+            height: 35px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background:
+                rgba(212,175,55,.10);
+
+            color: #d4af37;
+        }
+
+        .section-icon svg {
+            width: 18px;
+        }
+
+        .section h2 {
+            margin: 0;
+
+            font-size: 15px;
+            font-weight: 500;
+
+            color: #eee;
+        }
+
+        .section-subtitle {
+            margin: 2px 0 0;
+
+            color: #777;
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           PROFILE
+        ===================================================== */
+
+        .profile-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 10px;
+        }
+
+        .profile-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            min-height: 50px;
+
+            padding: 11px 13px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            border:
+                1px solid rgba(255,255,255,.05);
+
+            transition: .25s;
+        }
+
+        .profile-row:hover {
+            background:
+                rgba(212,175,55,.06);
+
+            border-color:
+                rgba(212,175,55,.13);
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .profile-info svg {
+            width: 15px;
+            color: #d4af37;
+        }
+
+        .label {
+            color: #888;
+            font-size: 10px;
+        }
+
+        .profile-value {
+            color: #ddd;
+            font-size: 11px;
+            font-weight: 500;
+
+            text-align: right;
+        }
+
+
+        /* =====================================================
+           CHECK-IN SUMMARY
+        ===================================================== */
+
+        .summary-card {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            padding: 15px;
+
+            margin-bottom: 15px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(212,175,55,.10),
+                    rgba(255,255,255,.035)
+                );
+
+            border:
+                1px solid rgba(212,175,55,.13);
+        }
+
+        .summary-icon {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background:
+                rgba(212,175,55,.12);
+
+            color: #d4af37;
+        }
+
+        .summary-icon svg {
+            width: 20px;
+        }
+
+        .summary-content span {
+            display: block;
+
+            color: #888;
+            font-size: 10px;
+        }
+
+        .summary-content strong {
+            display: block;
+
+            margin-top: 1px;
+
+            color: #d4af37;
+
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           CHECK-IN ITEMS
+        ===================================================== */
+
+        .checkin {
+            padding: 16px;
+
+            margin-bottom: 10px;
+
+            border-radius: 13px;
+
+            background:
+                rgba(255,255,255,.035);
+
+            border:
+                1px solid rgba(255,255,255,.05);
+
+            transition: .25s;
+        }
+
+        .checkin:hover {
+            background:
+                rgba(255,255,255,.05);
+
+            border-color:
+                rgba(212,175,55,.13);
+        }
+
+        .checkin-header {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            margin-bottom: 13px;
+
+            color: #d4af37;
+
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .checkin-header svg {
+            width: 16px;
+        }
+
+        .checkin-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 8px;
+        }
+
+        .checkin-stat {
+            padding: 10px;
+
+            border-radius: 9px;
+
+            background:
+                rgba(255,255,255,.035);
+        }
+
+        .checkin-stat-top {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            color: #777;
+
+            font-size: 9px;
+        }
+
+        .checkin-stat-top svg {
+            width: 13px;
+            color: #d4af37;
+        }
+
+        .checkin-stat-value {
+            margin-top: 5px;
+
+            color: #ddd;
+
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .notes {
+            margin-top: 10px;
+
+            padding: 10px;
+
+            border-radius: 9px;
+
+            background:
+                rgba(212,175,55,.05);
+
+            color: #aaa;
+
+            font-size: 10px;
+        }
+
+        .notes-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+
+            margin-bottom: 4px;
+
+            color: #d4af37;
+        }
+
+        .notes-header svg {
+            width: 13px;
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        .empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            padding: 35px 20px;
+
+            text-align: center;
+
+            color: #777;
+
+            font-size: 11px;
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 12px;
+
+            border-radius: 14px;
+
+            background:
+                rgba(212,175,55,.08);
+
+            color: #d4af37;
+        }
+
+        .empty-icon svg {
+            width: 21px;
+        }
+
+        .empty-action {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            margin-top: 15px;
+
+            padding: 10px 14px;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #f4d35e,
+                    #b8860b
+                );
+
+            color: #111;
+
+            font-size: 10px;
+            font-weight: 600;
+
+            transition: .25s;
+        }
+
+        .empty-action:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 25px rgba(212,175,55,.15);
+        }
+
+        .empty-action svg {
+            width: 14px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            text-align: center;
+
+            padding: 5px;
+
+            color: #555;
+
+            font-size: 9px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media(max-width: 700px) {
+
+            .dashboard {
+                padding: 12px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+
+                padding: 17px;
+            }
+
+            .header-left {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkin-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 420px) {
+
+            .checkin-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-row {
+                align-items: flex-start;
+                gap: 8px;
+                flex-direction: column;
+            }
+
+            .profile-value {
+                text-align: left;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<div class="dashboard">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+        <div class="header-left">
+
+            <div class="header-icon">
+                <i data-lucide="layout-dashboard"></i>
+            </div>
+
+            <div>
+
+                <h1>Dhanvantri Dashboard</h1>
+
+                <p>
+                    Your personalized wellness overview
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <a href="{{ url_for('home') }}"
+           class="back-btn">
+
+            <i data-lucide="arrow-left"></i>
+
+            <span>Back to Dhanvantri</span>
+
+        </a>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         PROFILE
+    ====================================================== -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div class="section-icon">
+                <i data-lucide="user-round-cog"></i>
+            </div>
+
+            <div>
+
+                <h2>Wellness Profile</h2>
+
+                <p class="section-subtitle">
+                    Your personal wellness information
+                </p>
+
+            </div>
+
+        </div>
+
+
+        {% if profile %}
+
+        <div class="profile-grid">
+
+
+            <!-- AGE -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="calendar-days"></i>
+
+                    <span class="label">
+                        Age
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.age or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- GENDER -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="users"></i>
+
+                    <span class="label">
+                        Gender
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.gender or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- WELLNESS GOAL -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="target"></i>
+
+                    <span class="label">
+                        Wellness Goal
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.wellness_goal or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- ACTIVITY -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="activity"></i>
+
+                    <span class="label">
+                        Activity Level
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.activity_level or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- SLEEP -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="moon"></i>
+
+                    <span class="label">
+                        Sleep Hours
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.sleep_hours or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- DIET -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="utensils"></i>
+
+                    <span class="label">
+                        Dietary Preference
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.dietary_preference or "Not provided" }}
+                </span>
+
+            </div>
+
+
+            <!-- INTEREST -->
+
+            <div class="profile-row">
+
+                <div class="profile-info">
+
+                    <i data-lucide="heart-pulse"></i>
+
+                    <span class="label">
+                        Wellness Interest
+                    </span>
+
+                </div>
+
+                <span class="profile-value">
+                    {{ profile.wellness_interest or "Not provided" }}
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="empty">
+
+            <div class="empty-icon">
+                <i data-lucide="user-round-x"></i>
+            </div>
+
+            No wellness profile found.
+
+        </div>
+
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================================
+         CHECK-IN
+    ====================================================== -->
+
+    <section class="section">
+
+
+        <div class="section-header">
+
+            <div class="section-icon">
+                <i data-lucide="clipboard-check"></i>
+            </div>
+
+            <div>
+
+                <h2>Recent Wellness Check-ins</h2>
+
+                <p class="section-subtitle">
+                    Track your recent wellness activities
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        {% if checkins %}
+
+
+        <!-- SUMMARY -->
+
+        <div class="summary-card">
+
+            <div class="summary-icon">
+
+                <i data-lucide="bar-chart-3"></i>
+
+            </div>
+
+            <div class="summary-content">
+
+                <span>
+                    Total Check-ins
+                </span>
+
+                <strong>
+                    {{ checkins|length }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CHECK-IN LIST -->
+
+        {% for checkin in checkins %}
+
+        <div class="checkin">
+
+
+            <div class="checkin-header">
+
+                <i data-lucide="calendar-check"></i>
+
+                <span>
+                    Check-in {{ loop.index }}
+                </span>
+
+            </div>
+
+
+            <div class="checkin-grid">
+
+
+                <!-- SLEEP -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="moon"></i>
+
+                        <span>
+                            Sleep
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.sleep_hours or "—" }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ENERGY -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="zap"></i>
+
+                        <span>
+                            Energy
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.energy or "—" }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- MOOD -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="smile"></i>
+
+                        <span>
+                            Mood
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.mood or "—" }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- STRESS -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="brain"></i>
+
+                        <span>
+                            Stress
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.stress or "—" }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- HYDRATION -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="droplets"></i>
+
+                        <span>
+                            Hydration
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.hydration or "—" }}
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIVITY -->
+
+                <div class="checkin-stat">
+
+                    <div class="checkin-stat-top">
+
+                        <i data-lucide="footprints"></i>
+
+                        <span>
+                            Activity
+                        </span>
+
+                    </div>
+
+                    <div class="checkin-stat-value">
+
+                        {{ checkin.activity_minutes or "—" }}
+                        minutes
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            {% if checkin.notes %}
+
+            <div class="notes">
+
+                <div class="notes-header">
+
+                    <i data-lucide="notebook-pen"></i>
+
+                    <span>Notes</span>
+
+                </div>
+
+                {{ checkin.notes }}
+
+            </div>
+
+            {% endif %}
+
+
+        </div>
+
+        {% endfor %}
+
+
+        {% else %}
+
+
+        <!-- EMPTY CHECK-IN -->
+
+        <div class="empty">
+
+            <div class="empty-icon">
+
+                <i data-lucide="clipboard-x"></i>
+
+            </div>
+
+            <span>
+                No wellness check-ins recorded yet.
+            </span>
+
+
+            <a href="{{ url_for('checkin') }}"
+               class="empty-action">
+
+                <i data-lucide="clipboard-check"></i>
+
+                Complete Today's Check-in
+
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div class="footer">
+
+        Dhanvantri · AI Wellness Companion
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       INITIALIZE LUCIDE ICONS
+    ===================================================== */
+
+    lucide.createIcons();
+
+</script>
+
+
+</body>
+</html>

@@ -1,441 +1,2610 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Dhanvantri Bot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo1.png') }}">
+    <title>Dhanvantri AI | AI Wellness Companion</title>
+
+    <!-- Flask CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
+    <!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<!-- Markdown Renderer -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Favicon -->
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='logo1.png') }}">
+
     <style>
-        /* ================= GLOBAL ================= */
-        * { box-sizing: border-box; }
-        body { margin: 0; font-family:'Poppins', sans-serif; background:#0b0b0b; color:white; overflow-x:hidden; cursor:none; }
 
-        /* ================= TRAIL CANVAS ================= */
-        #trailCanvas {
-            position: fixed;
-            top:0; left:0;
-            width:100%;
-            height:100%;
-            pointer-events:none;
-            z-index:1; /* behind UI but above background */
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
         }
 
-        /* ================= BACKGROUND ================= */
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0b0b0b;
+            color: white;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-weight: 500;
+            letter-spacing: .5px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #cfcfcf;
+        }
+
+
+        /* =====================================================
+           BACKGROUND
+        ===================================================== */
+
         #bg {
             position: fixed;
-            width:100%;
-            height:100%;
-            z-index:-2;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+
+            background:
+                radial-gradient(
+                    circle at 70% 20%,
+                    rgba(255, 215, 0, .09),
+                    transparent 35%
+                ),
+                #0b0b0b;
         }
 
-        /* ================= CURSOR ================= */
-        .cursor {
-            width:10px; height:10px;
-            background: gold;
-            border-radius:50%;
+        #trailCanvas {
             position: fixed;
-            pointer-events:none;
-            z-index:999;
-            transform:translate(-50%,-50%);
-            box-shadow: 0 0 10px gold;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
         }
 
-        /* ================= APP LAYOUT ================= */
-        .app { display:flex; }
 
-        /* ================= SIDEBAR ================= */
+        /* =====================================================
+           CUSTOM CURSOR
+        ===================================================== */
+
+        .cursor {
+            width: 10px;
+            height: 10px;
+
+            background: #ffd700;
+
+            border-radius: 50%;
+
+            position: fixed;
+
+            pointer-events: none;
+
+            z-index: 9999;
+
+            transform: translate(-50%, -50%);
+
+            box-shadow:
+                0 0 10px #ffd700,
+                0 0 25px rgba(255, 215, 0, .35);
+        }
+
+
+        /* =====================================================
+           APP
+        ===================================================== */
+
+        .app {
+            width: 100%;
+            height: 100vh;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
         .sidebar {
-            width:260px; height:100vh;
-            background:rgba(255,255,255,0.05);
-            backdrop-filter:blur(15px);
-            display:flex; flex-direction:column;
-            padding:60px 15px 15px 15px;
-            position:fixed; top:0; left:0;
-            transition:0.3s;
-            z-index:20;
+            width: 260px;
+            height: 100vh;
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 60px 15px 15px;
+
+            background:
+                rgba(255, 255, 255, .05);
+
+            backdrop-filter: blur(18px);
+
+            border-right:
+                1px solid rgba(255, 255, 255, .07);
+
+            transition: .3s;
+
+            z-index: 20;
         }
 
-        .sidebar.hide { left:-260px; }
+        .sidebar.hide {
+            left: -260px;
+        }
+
+
+        /* =====================================================
+           BRAND
+        ===================================================== */
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 0 5px 20px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            color: #111;
+
+            box-shadow:
+                0 6px 20px rgba(255, 215, 0, .15);
+        }
+
+        .brand-icon svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .brand-text h2 {
+            margin: 0;
+
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .brand-text span {
+            display: block;
+
+            margin-top: 2px;
+
+            font-size: 10px;
+            color: #888;
+        }
+
+
+        /* =====================================================
+           MENU BUTTON
+        ===================================================== */
 
         .menu-btn {
-            font-size:28px; cursor:pointer; padding:10px;
-            position:fixed; top:15px; left:15px;
-            z-index:100; color:white;
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: fixed;
+
+            top: 15px;
+            left: 15px;
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            border-radius: 10px;
+
+            background:
+                rgba(20,20,20,.75);
+
+            color: white;
+
+            cursor: pointer;
+
+            z-index: 100;
+
+            backdrop-filter: blur(15px);
+
+            transition: .25s;
         }
 
-        .new-chat { display:block; background:gold; color:black; padding:10px; border-radius:10px; text-align:center; text-decoration:none; margin-bottom:10px; }
-        .search-bar { width:100%; padding:10px; border-radius:20px; border:none; outline:none; background:rgba(255,255,255,0.08); color:white; }
+        .menu-btn:hover {
+            color: #ffd700;
 
-        .chat-list { flex:1; overflow-y:auto; margin-top:10px; }
-        .chat-row { display:flex; align-items:center; justify-content:space-between; gap:6px; }
-        .chat-item { flex:1; padding:8px; margin:5px 0; background:rgba(255,255,255,0.08); border-radius:8px; text-decoration:none; color:white; }
-        .chat-item:hover { background:rgba(255,255,255,0.15); }
-        .chat-row.active .chat-item { background: rgba(255,215,0,0.2); border:1px solid gold; }
-        .delete-btn { opacity:0; transition:0.3s; font-size:13px; padding:4px 6px; border-radius:6px; color:#ff6b6b; }
-        .chat-row:hover .delete-btn { opacity:1; }
+            border-color:
+                rgba(255,215,0,.4);
+        }
 
-        .user-box { margin-top:auto; padding:12px; background:rgba(255,255,255,0.05); border-radius:10px; text-align:center; }
-        .logout-btn { display:block; margin-top:8px; padding:8px; background:gold; color:black; border-radius:8px; text-decoration:none; }
-        #dots::after {
-    content: '';
-    animation: dots 1.2s steps(4, end) infinite;
-}
+        .menu-btn svg {
+            width: 20px;
+        }
 
-@keyframes dots {
-    0% { content: ''; }
-    25% { content: '.'; }
-    50% { content: '..'; }
-    75% { content: '...'; }
-    100% { content: ''; }
-}
-        /* ================= MAIN ================= */
+
+        /* =====================================================
+           NEW CHAT
+        ===================================================== */
+
+        .new-chat {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            padding: 11px;
+
+            margin-bottom: 10px;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            color: #111;
+
+            font-size: 12px;
+            font-weight: 500;
+
+            transition: .25s;
+        }
+
+        .new-chat:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 25px rgba(255,215,0,.18);
+        }
+
+        .new-chat svg {
+            width: 16px;
+        }
+
+
+        /* =====================================================
+           SEARCH
+        ===================================================== */
+
+        .search-wrapper {
+            position: relative;
+        }
+
+        .search-wrapper svg {
+            position: absolute;
+
+            left: 12px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            width: 15px;
+
+            color: #777;
+        }
+
+        .search-bar {
+            width: 100%;
+
+            padding: 10px 12px 10px 36px;
+
+            border: 1px solid rgba(255,255,255,.06);
+
+            outline: none;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,.08);
+
+            color: white;
+
+            font-size: 11px;
+        }
+
+        .search-bar:focus {
+            border-color:
+                rgba(255,215,0,.4);
+        }
+
+        .search-bar::placeholder {
+            color: #777;
+        }
+
+
+        /* =====================================================
+           CHAT LIST
+        ===================================================== */
+
+        .chat-list {
+            flex: 1;
+
+            overflow-y: auto;
+
+            margin-top: 10px;
+
+            padding-right: 3px;
+        }
+
+        .chat-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chat-list::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 10px;
+        }
+
+        .chat-row {
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+        }
+
+        .chat-item {
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 9px;
+
+            margin: 4px 0;
+
+            background:
+                rgba(255,255,255,.05);
+
+            border-radius: 9px;
+
+            color: white;
+
+            transition: .25s;
+        }
+
+        .chat-item:hover {
+            background:
+                rgba(255,255,255,.12);
+        }
+
+        .chat-row.active .chat-item {
+            background:
+                rgba(255,215,0,.15);
+
+            border:
+                1px solid rgba(255,215,0,.35);
+        }
+
+        .chat-title {
+            overflow: hidden;
+
+            white-space: nowrap;
+
+            text-overflow: ellipsis;
+
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .chat-date {
+            display: block;
+
+            margin-top: 3px;
+
+            font-size: 10px;
+
+            color: #888;
+        }
+
+        .delete-btn {
+            width: 28px;
+            height: 28px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #777;
+
+            border-radius: 7px;
+
+            opacity: 0;
+
+            transition: .25s;
+        }
+
+        .delete-btn:hover {
+            background:
+                rgba(255,70,70,.1);
+
+            color: #ff6b6b;
+        }
+
+        .delete-btn svg {
+            width: 14px;
+        }
+
+        .chat-row:hover .delete-btn {
+            opacity: 1;
+        }
+
+
+        /* =====================================================
+           USER BOX
+        ===================================================== */
+
+        .user-box {
+            margin-top: auto;
+
+            padding: 12px;
+
+            background:
+                rgba(255,255,255,.05);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+        .user-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            margin-bottom: 9px;
+
+            color: #ddd;
+
+            font-size: 12px;
+        }
+
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,215,0,.12);
+
+            color: #ffd700;
+        }
+
+        .user-avatar svg {
+            width: 14px;
+        }
+
+        .profile-btn,
+        .checkin-btn,
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            width: 100%;
+
+            margin-top: 7px;
+
+            padding: 9px;
+
+            border-radius: 8px;
+
+            color: white;
+
+            background:
+                rgba(255,255,255,.06);
+
+            font-size: 11px;
+
+            transition: .25s;
+        }
+
+        .profile-btn:hover,
+        .checkin-btn:hover {
+            background:
+                rgba(255,215,0,.15);
+
+            border-color:
+                rgba(255,215,0,.3);
+
+            color: #ffd700;
+        }
+
+        .logout-btn {
+            color: #ffd700;
+
+            border:
+                1px solid rgba(255,215,0,.15);
+        }
+
+        .logout-btn:hover {
+            background:
+                rgba(255,215,0,.15);
+        }
+
+        .user-box svg {
+            width: 14px;
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
         .main {
-            display:flex; flex-direction:column;
-            height:100vh; padding:20px;
-            margin-left:260px; width:calc(100% - 260px);
-            transition:0.3s;
-            z-index:2; /* above canvas */
+            display: flex;
+            flex-direction: column;
+
+            height: 100vh;
+
+            padding: 20px;
+
+            margin-left: 260px;
+
+            width: calc(100% - 260px);
+
+            transition: .3s;
+
+            position: relative;
+
+            z-index: 2;
         }
 
-        .main.full { margin-left:0; width:100%; }
+        .main.full {
+            margin-left: 0;
+            width: 100%;
+        }
 
-        .header { text-align:center; background:rgba(255,255,255,0.05); padding:14px; border-radius:12px; margin-bottom:10px; }
 
-        .wellness { display:flex; gap:10px; margin-bottom:10px; }
-        .card { flex:1; padding:10px; border-radius:10px; background:rgba(255,255,255,0.06); text-align:center; }
-        .card b { color:gold; }
+        /* =====================================================
+           HEADER
+        ===================================================== */
 
-        .chat-area { flex:1; overflow-y:auto; padding-right:5px; }
+        .header {
+            position: relative;
+
+            text-align: center;
+
+            background:
+                rgba(255,255,255,.05);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            backdrop-filter: blur(15px);
+
+            padding: 14px;
+
+            border-radius: 12px;
+
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 21px;
+        }
+
+        .subtitle {
+            margin: 3px 0 0;
+
+            font-size: 11px;
+
+            color: #888;
+        }
+
+        .dashboard-btn {
+            position: absolute;
+
+            right: 14px;
+            top: 14px;
+
+            display: flex;
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 8px 11px;
+
+            border-radius: 8px;
+
+            background:
+                rgba(255,215,0,.08);
+
+            border:
+                1px solid rgba(255,215,0,.18);
+
+            color: #ffd700;
+
+            font-size: 10px;
+
+            transition: .25s;
+        }
+
+        .dashboard-btn:hover {
+            background:
+                rgba(255,215,0,.17);
+
+            color: white;
+        }
+
+        .dashboard-btn svg {
+            width: 14px;
+        }
+
+
+        /* =====================================================
+           WELLNESS CARDS
+        ===================================================== */
+
+        .wellness {
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 10px;
+        }
+
+        .card {
+            flex: 1;
+
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 11px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,255,255,.06);
+
+            border:
+                1px solid rgba(255,255,255,.05);
+        }
+
+        .card-icon {
+            width: 34px;
+            height: 34px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 9px;
+
+            background:
+                rgba(255,215,0,.1);
+
+            color: #ffd700;
+        }
+
+        .card-icon svg {
+            width: 17px;
+        }
+
+        .card-content {
+            min-width: 0;
+        }
+
+        .card b {
+            color: #ffd700;
+
+            font-size: 10px;
+        }
+
+        .card p {
+            margin: 2px 0 0;
+
+            color: #aaa;
+
+            font-size: 10px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+        }
+
+
+        /* =====================================================
+           CHAT AREA
+        ===================================================== */
+
+        .chat-area {
+            flex: 1;
+
+            overflow-y: auto;
+
+            padding-right: 5px;
+
+            scroll-behavior: smooth;
+        }
+
+        .chat-area::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #ffd700;
+
+            border-radius: 10px;
+        }
+
         .chat-wrapper {
-    width: 100%;
-    max-width: 800px;
-    margin:0 auto;   /* 🔥 controls chat width */
-}
-        .message { max-width:65%; padding:10px 14px 20px; margin:8px 0; border-radius:12px; position:relative; font-size:14px; }
-        .user { background:linear-gradient(135deg,#FFD700,#C9A227); color:black; margin-left:auto; }
-        .bot { background:#222; }
-        .message .time { position:absolute; bottom:4px; right:10px; font-size:10px; opacity:0.7; }
+            width: 100%;
 
-        .suggestions { display:flex; gap:10px; justify-content:center; margin:10px 0; flex-wrap:wrap; }
-        .suggestions button { padding:8px 14px; border:none; border-radius:20px; background:rgba(255,255,255,0.08); color:white; cursor:pointer; }
-        .suggestions button:hover { background:gold; color:black; }
+            max-width: 800px;
 
-        .input-form { display:flex; gap:10px; width:100%; }
-        .input-form input { flex:1; padding:14px; border-radius:12px; border:none; outline:none; background:#1c1c1c; color:white; }
-        .input-form button { padding:14px 18px; border:none; border-radius:12px; background:linear-gradient(135deg,#FFD700,#C9A227); color:black; cursor:pointer; }
-
-        .chat-area::-webkit-scrollbar { width:6px; }
-        .chat-area::-webkit-scrollbar-thumb { background:gold; border-radius:10px; }
-
-        @media (max-width:700px){
-            .sidebar {
-        left: -260px;
-        position: fixed;
-        z-index: 50; /* bring above everything */
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
-            .main { margin-left:0; width:100%; }
-            .message { max-width:90%; }
+            margin: 0 auto;
         }
+
+
+        /* =====================================================
+           WELCOME
+        ===================================================== */
+
+        .welcome {
+            min-height: 250px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .welcome-icon {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255,215,0,.18),
+                    rgba(255,215,0,.04)
+                );
+
+            color: #ffd700;
+
+            margin-bottom: 13px;
+        }
+
+        .welcome-icon svg {
+            width: 28px;
+        }
+
+        .welcome h2 {
+            margin: 0;
+
+            font-size: 19px;
+        }
+
+        .welcome p {
+            margin-top: 7px;
+
+            color: #888;
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ===================================================== */
+
+        .message {
+            position: relative;
+
+            width: fit-content;
+
+            max-width: 65%;
+
+            padding: 10px 14px 20px;
+
+            margin: 8px 0;
+
+            border-radius: 12px;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            animation:
+                messageIn .25s ease;
+
+            word-wrap: break-word;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            margin-left: auto;
+
+            color: black;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            box-shadow:
+                0 6px 20px rgba(255,215,0,.08);
+        }
+
+        .message.bot {
+            background:
+                rgba(255,255,255,.07);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            color: #ddd;
+        }
+        /* =====================================================
+   BOT MESSAGE MARKDOWN
+===================================================== */
+
+.message.bot {
+    padding: 14px 17px 22px;
+    line-height: 1.65;
+}
+
+/* Paragraphs */
+.message.bot p {
+    margin: 0 0 10px;
+    color: #dddddd;
+    line-height: 1.7;
+}
+
+.message.bot p:last-child {
+    margin-bottom: 0;
+}
+
+/* Bold text */
+.message.bot strong {
+    color: #ffd700;
+    font-weight: 600;
+}
+
+/* Headings */
+.message.bot h1,
+.message.bot h2,
+.message.bot h3 {
+    color: #ffd700;
+    margin: 10px 0 7px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Lists */
+.message.bot ul,
+.message.bot ol {
+    margin: 7px 0 12px;
+    padding-left: 21px;
+}
+
+.message.bot li {
+    margin: 5px 0;
+    color: #dddddd;
+    line-height: 1.6;
+}
+
+/* Links */
+.message.bot a {
+    color: #ffd700;
+    text-decoration: underline;
+}
+
+/* Quotes */
+.message.bot blockquote {
+    margin: 10px 0;
+    padding: 9px 13px;
+    border-left: 3px solid #ffd700;
+    background: rgba(255,215,0,.06);
+    border-radius: 6px;
+    color: #cccccc;
+}
+
+/* Code */
+.message.bot code {
+    background: rgba(255,255,255,.08);
+    color: #ffd700;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* Horizontal line */
+.message.bot hr {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,.1);
+    margin: 12px 0;
+}
+        .message .time {
+            position: absolute;
+
+            bottom: 4px;
+
+            right: 10px;
+
+            font-size: 9px;
+
+            opacity: .6;
+        }
+
+
+        /* =====================================================
+           TYPING
+        ===================================================== */
+
+        #typing {
+    display: none;
+    width: fit-content;
+    margin: 8px 0;
+    padding: 10px 14px;
+
+    color: #ffd700;
+
+    background: rgba(255, 215, 0, 0.06);
+    border: 1px solid rgba(255, 215, 0, 0.12);
+    border-radius: 12px;
+
+    font-size: 12px;
+}
+
+#typing svg {
+    width: 15px;
+    height: 15px;
+
+    vertical-align: middle;
+    margin-right: 6px;
+
+    animation: sparklePulse 1s ease-in-out infinite;
+}
+
+@keyframes sparklePulse {
+
+    0%, 100% {
+        opacity: .4;
+        transform: scale(.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+}
+
+
+        #dots::after {
+            content: '';
+
+            animation:
+                dots 1.2s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0% {
+                content: '';
+            }
+
+            25% {
+                content: '.';
+            }
+
+            50% {
+                content: '..';
+            }
+
+            75% {
+                content: '...';
+            }
+
+            100% {
+                content: '';
+            }
+        }
+
+
+        /* =====================================================
+           SUGGESTIONS
+        ===================================================== */
+
+        .suggestions {
+            display: flex;
+
+            gap: 10px;
+
+            justify-content: center;
+
+            margin: 10px 0;
+
+            flex-wrap: wrap;
+        }
+
+        .suggestion {
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 8px 14px;
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,.08);
+
+            color: white;
+
+            cursor: pointer;
+
+            transition: .25s;
+
+            font-size: 10px;
+        }
+
+        .suggestion:hover {
+            background: #ffd700;
+
+            color: black;
+
+            border-color: #ffd700;
+        }
+
+        .suggestion svg {
+            width: 13px;
+        }
+
+
+        /* =====================================================
+           INPUT
+        ===================================================== */
+
+        .input-container {
+            width: 100%;
+
+            max-width: 800px;
+
+            margin: 0 auto;
+        }
+
+        .input-form {
+            display: flex;
+
+            gap: 10px;
+
+            width: 100%;
+        }
+
+        .input-form input {
+            flex: 1;
+
+            min-width: 0;
+
+            padding: 14px;
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            border-radius: 12px;
+
+            outline: none;
+
+            background:
+                #1c1c1c;
+
+            color: white;
+
+            font-size: 12px;
+        }
+
+        .input-form input:focus {
+            border-color:
+                rgba(255,215,0,.4);
+        }
+
+        .input-form input::placeholder {
+            color: #666;
+        }
+
+        .input-form button {
+            width: 48px;
+
+            height: 48px;
+
+            flex-shrink: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffd700,
+                    #c9a227
+                );
+
+            color: black;
+
+            cursor: pointer;
+
+            transition: .25s;
+        }
+
+        .input-form button:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 6px 20px rgba(255,215,0,.2);
+        }
+
+        .input-form button:disabled {
+            opacity: .6;
+
+            cursor: not-allowed;
+
+            transform: none;
+        }
+
+        .input-form button svg {
+            width: 18px;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            body {
+                cursor: default;
+            }
+
+            .cursor {
+                display: none;
+            }
+
+            .sidebar {
+                left: -260px;
+
+                box-shadow:
+                    10px 0 40px rgba(0,0,0,.5);
+
+                z-index: 50;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main {
+                margin-left: 0;
+
+                width: 100%;
+
+                padding: 65px 12px 12px;
+            }
+
+            .header {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .subtitle {
+                font-size: 9px;
+            }
+
+            .dashboard-btn {
+                position: static;
+
+                width: 34px;
+                height: 34px;
+
+                padding: 0;
+
+                justify-content: center;
+
+                float: right;
+
+                margin-top: -42px;
+            }
+
+            .dashboard-btn span {
+                display: none;
+            }
+
+            .wellness {
+                flex-direction: column;
+            }
+
+            .card p {
+                white-space: normal;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .suggestion {
+                padding: 7px 11px;
+            }
+
+            .input-form input {
+                padding: 12px;
+            }
+
+            .input-form button {
+                width: 44px;
+
+                height: 44px;
+            }
+        }
+
     </style>
 </head>
 
+
 <body>
 
-    <!-- BACKGROUND -->
+    <!-- =====================================================
+         BACKGROUND
+    ===================================================== -->
+
     <div id="bg"></div>
+
     <canvas id="trailCanvas"></canvas>
+
     <div class="cursor" id="cursor"></div>
+
 
     <div class="app">
 
-        <!-- SIDEBAR -->
-        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-        <div class="sidebar" id="sidebar">
-            <h2>🌿 Dhanvantri Bot</h2>
-            <a class="new-chat" href="/new">+ New Chat</a>
-            <input type="text" id="searchChat" placeholder="🔍 Search..." class="search-bar">
+
+        <!-- =================================================
+             MENU BUTTON
+        ================================================= -->
+
+        <button
+            class="menu-btn"
+            onclick="toggleSidebar()"
+            aria-label="Toggle menu">
+
+            <i data-lucide="menu"></i>
+
+        </button>
+
+
+        <!-- =================================================
+             SIDEBAR
+        ================================================= -->
+
+        <aside class="sidebar" id="sidebar">
+
+
+            <!-- BRAND -->
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    <i data-lucide="leaf"></i>
+                </div>
+
+                <div class="brand-text">
+
+                    <h2>Dhanvantri AI</h2>
+
+                    <span>
+                        AI Wellness Companion
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- NEW CHAT -->
+
+            <a
+                class="new-chat"
+                href="/new">
+
+                <i data-lucide="plus"></i>
+
+                <span>
+                    New Conversation
+                </span>
+
+            </a>
+
+
+            <!-- SEARCH -->
+
+            <div class="search-wrapper">
+
+                <i data-lucide="search"></i>
+
+                <input
+                    type="text"
+                    id="searchChat"
+                    placeholder="Search conversations..."
+                    class="search-bar">
+
+            </div>
+
+
+            <!-- CHAT LIST -->
+
             <div class="chat-list">
+
                 {% for chat in chats %}
-                <div class="chat-row {% if chat.id == current_chat.id %}active{% endif %}">
-                    <a href="/chat/{{chat.id}}" class="chat-item">
-                        <div class="chat-title">{{chat.title}}</div>
-                        <span class="chat-date">{{chat.display_date}}</span>
+
+                <div
+                    class="chat-row
+                    {% if current_chat and chat.id == current_chat.id %}active{% endif %}">
+
+                    <a
+                        href="/chat/{{ chat.id }}"
+                        class="chat-item">
+
+                        <div class="chat-title" id="chat-title-{{ chat.id }}">
+                            {{ chat.title }}
+                        </div>
+
+                        <span class="chat-date">
+                            {{ chat.display_date }}
+                        </span>
+
                     </a>
-                    <a href="/delete/{{chat.id}}" class="delete-btn" onclick="return confirm('Delete this chat?')">🗑</a>
+
+
+                    <a
+                        href="/delete/{{ chat.id }}"
+                        class="delete-btn"
+                        onclick="return confirm('Delete this conversation?')"
+                        aria-label="Delete chat">
+
+                        <i data-lucide="trash-2"></i>
+
+                    </a>
+
                 </div>
+
                 {% endfor %}
+
             </div>
+
+
+            <!-- USER -->
+
             <div class="user-box">
-                <div>👤 {{ user }}</div>
-                <a class="logout-btn" href="/logout">Logout</a>
-            </div>
-        </div>
 
-        <!-- MAIN -->
-        <div class="main">
-            <div class="header">
-                <h1>🌿 Dhanvantri - Your Daily Health Companion</h1>
-            </div>
+                <div class="user-name">
 
-            <div class="wellness">
-                <div class="card">
-                    <b>Daily Health Tip</b>
-                    <p>{{tip}}</p>
+                    <div class="user-avatar">
+                        <i data-lucide="user-round"></i>
+                    </div>
+
+                    <span>
+                        {{ user }}
+                    </span>
+
                 </div>
-                <div class="card">
-                    <b>Yoga of the Day</b>
-                    <p>{{yoga}}</p>
-                </div>
+
+
+                <a
+                    class="profile-btn"
+                    href="{{ url_for('profile') }}">
+
+                    <i data-lucide="user-cog"></i>
+
+                    <span>
+                        My Wellness Profile
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="checkin-btn"
+                    href="{{ url_for('checkin') }}">
+
+                    <i data-lucide="clipboard-check"></i>
+
+                    <span>
+                        Daily Check-in
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="logout-btn"
+                    href="{{ url_for('logout') }}">
+
+                    <i data-lucide="log-out"></i>
+
+                    <span>
+                        Logout
+                    </span>
+
+                </a>
+
             </div>
 
-            <div class="chat-area" id="chatArea">
-    <div class="chat-wrapper">
-    {% if current_chat.messages|length == 0 %}
-        <div class="welcome">
-            <h2>🌿 Welcome to Dhanvantri</h2>
-            <p>Describe your symptoms to get Ayurvedic guidance.</p>
-        </div>
-    {% else %}
-        {% for msg in current_chat.messages %}
-            <div class="message {{msg.role}}">
-                {{ msg.content | safe }}
-                <div class="time">{{msg.time}}</div>
-            </div>
-        {% endfor %}
+        </aside>
+
+
+        <!-- =================================================
+             MAIN
+        ================================================= -->
+
+        <main class="main" id="main">
+
+
+            <!-- HEADER -->
+
+            <header class="header">
+
+                <h1>
+                    Dhanvantri AI
+                </h1>
+
+                <p class="subtitle">
+                    Your Personalized AI Wellness Companion
+                </p>
+
+
+                <a
+                    class="dashboard-btn"
+                    href="{{ url_for('dashboard') }}">
+
+                    <i data-lucide="layout-dashboard"></i>
+
+                    <span>
+                        Dashboard
+                    </span>
+
+                </a>
+
+            </header>
+
+
+            <!-- =================================================
+                 WELLNESS CARDS
+            ================================================= -->
+
+            <section class="wellness">
+
+                <div class="card">
+
+                    <div class="card-icon">
+
+                        <i data-lucide="lightbulb"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <b>
+                            Daily Health Tip
+                        </b>
+
+                        <p>
+                            {{ tip }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-icon">
+
+                        <i data-lucide="activity"></i>
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <b>
+                            Wellness Practice
+                        </b>
+
+                        <p>
+                            {{ yoga }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 CHAT AREA
+            ================================================= -->
+
+            <section
+                class="chat-area"
+                id="chatArea">
+
+                <div class="chat-wrapper"
+                     id="chatWrapper">
+
+
+                    {% if not current_chat or current_chat.messages|length == 0 %}
+
+                    <div class="welcome">
+
+                        <div class="welcome-icon">
+
+                            <i data-lucide="leaf"></i>
+
+                        </div>
+
+                        <h2>
+                            Welcome to Dhanvantri AI
+                        </h2>
+
+                        <p>
+                            Describe your symptoms to get
+                            personalized wellness guidance.
+                        </p>
+
+                    </div>
+
+                    {% else %}
+
+                    {% for msg in current_chat.messages %}
+
+<div class="message {{ msg.role }}"
+     {% if msg.role == "bot" %}
+     data-markdown="{{ msg.content | e }}"
+     {% endif %}>
+
+    {% if msg.role == "user" %}
+        {{ msg.content }}
     {% endif %}
 
-    <!-- ALWAYS PRESENT -->
-    
+    <div class="time">
+        {{ msg.time }}
+    </div>
 
-    <div id="typing" style="display:none; padding:10px; color:gold;">
-        🌿 Dhanvantri is typing<span id="dots"></span>
-    </div>
-    </div>
 </div>
 
+{% endfor %}
+
+                    {% endif %}
+
+
+                    <!-- TYPING -->
+
+                    <div id="typing">
+
+                        <i data-lucide="sparkles"></i>
+
+                        Dhanvantri AI is typing
+                        <span id="dots"></span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 SUGGESTIONS
+            ================================================= -->
+
             <div class="suggestions">
-                <button onclick="ask('I have fever')">Fever</button>
-                <button onclick="ask('I have cough')">Cough</button>
-                <button onclick="ask('I have allergy')">Allergy</button>
-                <button onclick="ask('I have stomach pain')">Stomach</button>
+
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    onclick="ask('I have fever')">
+
+                    <i data-lucide="thermometer"></i>
+
+                    <span>
+                        Fever
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    onclick="ask('I have cough')">
+
+                    <i data-lucide="wind"></i>
+
+                    <span>
+                        Cough
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    onclick="ask('I have allergy')">
+
+                    <i data-lucide="flower-2"></i>
+
+                    <span>
+                        Allergy
+                    </span>
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="suggestion"
+                    onclick="ask('I have stomach pain')">
+
+                    <i data-lucide="stethoscope"></i>
+
+                    <span>
+                        Stomach Pain
+                    </span>
+
+                </button>
+
             </div>
 
-            <form method="POST" class="input-form" onsubmit="sendMessage(event)">
-                <input type="text" name="question" placeholder="Describe your symptoms..." required>
-                <button type="submit">Ask</button>
-            </form>
-        </div>
+
+            <!-- =================================================
+                 INPUT
+            ================================================= -->
+
+            <div class="input-container">
+
+                <form
+                    method="POST"
+                    class="input-form"
+                    id="chatForm">
+
+                    <input
+                        type="text"
+                        id="questionInput"
+                        name="question"
+                        autocomplete="off"
+                        placeholder="Describe your symptoms or ask a health question..."
+                        required>
+
+                    <button
+                        type="submit"
+                        id="sendButton"
+                        aria-label="Send message">
+
+                        <i data-lucide="send"></i>
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </main>
 
     </div>
 
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
     <script>
-        /* SIDEBAR TOGGLE */
+
+        /* =====================================================
+           INITIALIZE LUCIDE
+        ===================================================== */
+
+        lucide.createIcons();
+        document.querySelectorAll(".message.bot[data-markdown]")
+    .forEach(message => {
+
+        const markdown = message.getAttribute("data-markdown");
+
+        message.innerHTML = marked.parse(markdown);
+
+        const time = document.createElement("div");
+
+        time.className = "time";
+
+        time.textContent = message.dataset.time || "";
+
+        message.appendChild(time);
+    });
+
+        /* =====================================================
+           DOM ELEMENTS
+        ===================================================== */
+
+        const sidebar =
+            document.getElementById("sidebar");
+
+        const main =
+            document.getElementById("main");
+
+        const chatArea =
+            document.getElementById("chatArea");
+
+        const chatWrapper =
+            document.getElementById("chatWrapper");
+
+        const typing =
+            document.getElementById("typing");
+
+        const input =
+            document.getElementById("questionInput");
+
+        const form =
+            document.getElementById("chatForm");
+
+        const sendButton =
+            document.getElementById("sendButton");
+
+        const searchChat =
+            document.getElementById("searchChat");
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
         function toggleSidebar() {
-    let sidebar = document.getElementById("sidebar");
 
-    if (window.innerWidth <= 700) {
-        sidebar.classList.toggle("active"); // mobile behavior
-    } else {
-        sidebar.classList.toggle("hide");   // desktop behavior
-        document.querySelector(".main").classList.toggle("full");
-    }
-}
-        function showTyping() {
-    document.getElementById("typing").style.display = "block";
-}
+            if (window.innerWidth <= 700) {
 
-function hideTyping() {
-    document.getElementById("typing").style.display = "none";
-}
+                sidebar.classList.toggle("active");
 
-        /* AUTO SCROLL CHAT */
-        window.onload = () => {
-    setTimeout(() => {
-        const chat = document.querySelector(".chat-wrapper");
-        chat.scrollTo({
-            top: chat.scrollHeight,
-            behavior: "smooth"
-        });
-    }, 100);
-};
+            } else {
 
-        /* SEARCH */
-        document.getElementById("searchChat").addEventListener("keyup", function() {
-            let value = this.value.toLowerCase();
-            document.querySelectorAll(".chat-row").forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(value) ? "flex" : "none";
-            });
-        });
+                sidebar.classList.toggle("hide");
 
-        /* QUICK ASK BUTTONS */
-        function ask(text) { document.querySelector("input[name='question']").value = text; }
-        function scrollToTopLatest() {
-    const messages = document.querySelectorAll(".chat-wrapper .message");
+                main.classList.toggle("full");
 
-    if (messages.length > 0) {
-        const lastMsg = messages[messages.length - 1];
-
-        lastMsg.scrollIntoView({
-            behavior: "smooth",
-            block: "start"   // 🔥 THIS puts it at TOP
-        });
-    }
-}
-        /* CURSOR */
-        const cursor = document.getElementById("cursor");
-        window.addEventListener("mousemove", e => { cursor.style.left = e.clientX + "px"; cursor.style.top = e.clientY + "px"; });
-
-        /* CURSOR TRAIL */
-        const canvas = document.getElementById("trailCanvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        let stars = [];
-        window.addEventListener("mousemove", e => { stars.push({x:e.clientX, y:e.clientY, size:2, life:40}); });
-
-        function animateStars() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            for(let i=0;i<stars.length;i++){
-                let s = stars[i];
-                ctx.beginPath();
-                ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
-                ctx.fillStyle = `rgba(255,215,0,${s.life/40})`;
-                ctx.fill();
-                s.size*=0.95; s.life--;
-                if(s.life<=0){ stars.splice(i,1); i--; }
             }
-            requestAnimationFrame(animateStars);
         }
-        
-        function scrollToLatestBotMessage() {
-    const chat = document.querySelector(".chat-wrapper");
-    const messages = chat.querySelectorAll(".message");
 
-    if (messages.length > 0) {
-        const lastMsg = messages[messages.length - 1];
 
-        chat.scrollTo({
-            top: lastMsg.offsetTop,
-            behavior: "smooth"
-        });
-    }
-}
+        /* =====================================================
+           SEARCH CONVERSATIONS
+        ===================================================== */
+
+        if (searchChat) {
+
+            searchChat.addEventListener("input", function () {
+
+                const value =
+                    this.value.toLowerCase().trim();
+
+                document
+                    .querySelectorAll(".chat-row")
+                    .forEach(row => {
+
+                        const text =
+                            row.innerText.toLowerCase();
+
+                        row.style.display =
+                            text.includes(value)
+                                ? "flex"
+                                : "none";
+
+                    });
+
+            });
+
+        }
+
+
+        /* =====================================================
+           ADD MESSAGE
+        ===================================================== */
+
         function addMessage(text, role) {
-    const chat = document.querySelector(".chat-wrapper");
 
-    const div = document.createElement("div");
-    div.className = "message " + role;
-    div.innerHTML = text;
+            const div =
+                document.createElement("div");
 
-    chat.appendChild(div);
+            div.className =
+                `message ${role}`;
+
+            if (role === "bot") {
+    div.innerHTML = marked.parse(text);
+} else {
+    div.textContent = text;
 }
 
-function scrollToBottom() {
-    const chat = document.querySelector(".chat-wrapper");
-    chat.scrollTo({
-        top: chat.scrollHeight,
-        behavior: "smooth"
+            const time =
+                document.createElement("div");
+
+            time.className = "time";
+
+            time.textContent =
+                new Date().toLocaleTimeString(
+                    [],
+                    {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }
+                );
+
+            div.appendChild(time);
+
+            chatWrapper.appendChild(div);
+
+            return div;
+        }
+
+
+        /* =====================================================
+           REMOVE WELCOME SCREEN
+        ===================================================== */
+
+        function removeWelcome() {
+
+            const welcome =
+                document.querySelector(".welcome");
+
+            if (welcome) {
+                welcome.remove();
+            }
+        }
+
+
+        /* =====================================================
+           SCROLL TO BOTTOM
+        ===================================================== */
+
+        function scrollToBottom(
+            behavior = "smooth"
+        ) {
+
+            if (!chatArea) return;
+
+            chatArea.scrollTo({
+
+                top: chatArea.scrollHeight,
+
+                behavior: behavior
+
+            });
+
+        }
+
+
+        /* =====================================================
+           SHOW TYPING
+        ===================================================== */
+
+        function showTyping() {
+
+    if (!typing) return;
+
+    // Move typing indicator to the very end
+    chatWrapper.appendChild(typing);
+
+    typing.style.display = "block";
+
+    requestAnimationFrame(() => {
+        scrollToBottom("smooth");
     });
 }
-        
-        animateStars();
 
-        /* THREE JS BACKGROUND */
-        let scene = new THREE.Scene();
-        let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        let renderer = new THREE.WebGLRenderer({alpha:true});
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.domElement.style.position="fixed";
-        renderer.domElement.style.zIndex="-2";
-        document.getElementById("bg").appendChild(renderer.domElement);
-        camera.position.z = 5;
 
-        const geometry = new THREE.BufferGeometry();
-        const count = 1200;
-        const positions = new Float32Array(count*3);
-        for(let i=0;i<count*3;i++) positions[i]=(Math.random()-0.5)*10;
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions,3));
-        const material = new THREE.PointsMaterial({color:0xFFD700, size:0.02});
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
+        /* =====================================================
+           HIDE TYPING
+        ===================================================== */
 
-        function animate() {
-            requestAnimationFrame(animate);
-            points.rotation.y += 0.0008;
-            renderer.render(scene, camera);
+        function hideTyping() {
+
+            if (!typing) return;
+
+            typing.style.display = "none";
         }
-        animate();
-        
-        /* RESIZE HANDLER */
-        window.addEventListener("resize", () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth/window.innerHeight;
-            camera.updateProjectionMatrix();
-        });
-        window.addEventListener("load", () => {
-    hideTyping();
-    setTimeout(scrollToTopLatest, 150);
-});
 
-async function sendMessage(e) {
-    e.preventDefault();
 
-    console.log("sendMessage triggered"); // DEBUG
+        /* =====================================================
+           QUICK QUESTIONS
+        ===================================================== */
 
-    const input = document.querySelector("input[name='question']");
+        function ask(text) {
+
+            input.value = text;
+
+            /*
+             * Automatically submit the question.
+             */
+
+            form.requestSubmit();
+
+        }
+
+
+        /* =====================================================
+           SEND MESSAGE
+        ===================================================== */
+
+        let sending = false;
+
+
+        form.addEventListener(
+            "submit",
+            sendMessage
+        );
+
+
+      // let sending = false;
+
+async function sendMessage(event) {
+
+    event.preventDefault();
+
+    if (sending) return;
+
     const text = input.value.trim();
 
     if (!text) return;
 
-    addMessage(text, "user");
+    sending = true;
+    sendButton.disabled = true;
+
+    removeWelcome();
+
+    // USER MESSAGE
+    const userMessage = addMessage(text, "user");
+
     input.value = "";
-    scrollToTopLatest();
 
-    const chat = document.querySelector(".chat-wrapper");
-    const typing = document.getElementById("typing");
+    requestAnimationFrame(() => {
+        userMessage.scrollIntoView({
+            behavior: "smooth",
+            block: "end"
+        });
+    });
 
-    if (!typing) {
-        console.error("Typing element missing!");
-        return;
-    }
-
-    chat.appendChild(typing);
+    // SHOW TYPING
     showTyping();
 
-    const typingDelay = new Promise(resolve => setTimeout(resolve, 2000));
-
-    const responsePromise = fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-    question: text,
-    chat_id: "{{ current_chat.id }}"
-})
-    }).then(res => res.json());
-
     try {
-        const [data] = await Promise.all([responsePromise, typingDelay]);
+
+        const response = await fetch("/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+
+            body: JSON.stringify({
+                question: text,
+                chat_id: "{{ current_chat.id if current_chat else '' }}"
+            })
+        });
+
+        // Get response safely
+        const contentType =
+            response.headers.get("content-type") || "";
+
+        let data;
+
+        if (contentType.includes("application/json")) {
+
+            data = await response.json();
+
+        } else {
+
+            const rawText = await response.text();
+
+            throw new Error(
+                "Server did not return JSON: " +
+                rawText.substring(0, 200)
+            );
+        }
+
+        console.log("FLASK RESPONSE:", data);
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.reply ||
+                data.error ||
+                `Server returned ${response.status}`
+            );
+        }
 
         hideTyping();
 
-        addMessage(data.reply, "bot");
-        scrollToTopLatest();
+        // UPDATE TITLE
+        if (data.title && data.chat_id) {
 
-    } catch (err) {
-        console.error("Chat error:", err);
+            const titleElement =
+                document.getElementById(
+                    "chat-title-" + data.chat_id
+                );
+
+            if (titleElement) {
+                titleElement.textContent = data.title;
+            }
+        }
+
+        // BOT RESPONSE
+        const botText =
+            data.reply ||
+            "I couldn't process that request. Please try again.";
+
+        const botMessage =
+            addMessage(botText, "bot");
+
+        requestAnimationFrame(() => {
+
+            botMessage.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        });
+
+        lucide.createIcons();
+
+    }
+
+    catch (error) {
+
+        console.error("Chat error:", error);
+
         hideTyping();
+
+        const errorMessage =
+            addMessage(
+                "❌ " + error.message,
+                "bot"
+            );
+
+        requestAnimationFrame(() => {
+
+            errorMessage.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+        });
+
+    }
+
+    finally {
+
+        sending = false;
+
+        sendButton.disabled = false;
+
+        input.focus();
     }
 }
-window.sendMessage = sendMessage;
+        /* =====================================================
+           CUSTOM CURSOR
+        ===================================================== */
+
+        const cursor =
+            document.getElementById("cursor");
+
+
+        window.addEventListener(
+            "mousemove",
+            function (event) {
+
+                if (!cursor) return;
+
+                cursor.style.left =
+                    event.clientX + "px";
+
+                cursor.style.top =
+                    event.clientY + "px";
+
+            }
+        );
+
+
+        /* =====================================================
+           GOLD CURSOR TRAIL
+        ===================================================== */
+
+        const canvas =
+            document.getElementById(
+                "trailCanvas"
+            );
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        function resizeCanvas() {
+
+            canvas.width =
+                window.innerWidth;
+
+            canvas.height =
+                window.innerHeight;
+
+        }
+
+
+        resizeCanvas();
+
+
+        let stars = [];
+
+
+        window.addEventListener(
+            "mousemove",
+            function (event) {
+
+                if (window.innerWidth <= 700) {
+                    return;
+                }
+
+                stars.push({
+
+                    x: event.clientX,
+
+                    y: event.clientY,
+
+                    size: 2,
+
+                    life: 40
+
+                });
+
+                /*
+                 * Prevent unlimited memory growth.
+                 */
+
+                if (stars.length > 150) {
+
+                    stars.shift();
+
+                }
+
+            }
+        );
+
+
+        function animateStars() {
+
+            ctx.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+
+
+            for (
+                let i = 0;
+                i < stars.length;
+                i++
+            ) {
+
+                const star =
+                    stars[i];
+
+
+                ctx.beginPath();
+
+
+                ctx.arc(
+                    star.x,
+                    star.y,
+                    star.size,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                ctx.fillStyle =
+                    `rgba(
+                        255,
+                        215,
+                        0,
+                        ${star.life / 40}
+                    )`;
+
+
+                ctx.fill();
+
+
+                star.size *= .95;
+
+                star.life--;
+
+
+                if (star.life <= 0) {
+
+                    stars.splice(i, 1);
+
+                    i--;
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animateStars
+            );
+
+        }
+
+
+        animateStars();
+
+
+        /* =====================================================
+           THREE.JS BACKGROUND
+        ===================================================== */
+
+        let scene;
+        let camera;
+        let renderer;
+        let points;
+
+
+        if (typeof THREE !== "undefined") {
+
+            scene =
+                new THREE.Scene();
+
+
+            camera =
+                new THREE.PerspectiveCamera(
+                    75,
+                    window.innerWidth /
+                    window.innerHeight,
+                    .1,
+                    1000
+                );
+
+
+            renderer =
+                new THREE.WebGLRenderer({
+                    alpha: true,
+                    antialias: true
+                });
+
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+
+
+            renderer.domElement.style.position =
+                "fixed";
+
+            renderer.domElement.style.top =
+                "0";
+
+            renderer.domElement.style.left =
+                "0";
+
+            renderer.domElement.style.width =
+                "100%";
+
+            renderer.domElement.style.height =
+                "100%";
+
+            renderer.domElement.style.zIndex =
+                "-1";
+
+
+            document
+                .getElementById("bg")
+                .appendChild(
+                    renderer.domElement
+                );
+
+
+            camera.position.z = 5;
+
+
+            const geometry =
+                new THREE.BufferGeometry();
+
+
+            const count = 1200;
+
+
+            const positions =
+                new Float32Array(
+                    count * 3
+                );
+
+
+            for (
+                let i = 0;
+                i < count * 3;
+                i++
+            ) {
+
+                positions[i] =
+                    (Math.random() - .5) * 10;
+
+            }
+
+
+            geometry.setAttribute(
+                "position",
+                new THREE.BufferAttribute(
+                    positions,
+                    3
+                )
+            );
+
+
+            const material =
+                new THREE.PointsMaterial({
+
+                    color: 0xFFD700,
+
+                    size: .02,
+
+                    transparent: true,
+
+                    opacity: .7
+
+                });
+
+
+            points =
+                new THREE.Points(
+                    geometry,
+                    material
+                );
+
+
+            scene.add(points);
+
+
+            function animateThree() {
+
+                requestAnimationFrame(
+                    animateThree
+                );
+
+
+                points.rotation.y += .0008;
+
+                points.rotation.x += .0001;
+
+
+                renderer.render(
+                    scene,
+                    camera
+                );
+
+            }
+
+
+            animateThree();
+
+        }
+
+
+        /* =====================================================
+           RESIZE
+        ===================================================== */
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                resizeCanvas();
+
+
+                if (
+                    renderer &&
+                    camera
+                ) {
+
+                    renderer.setSize(
+                        window.innerWidth,
+                        window.innerHeight
+                    );
+
+
+                    camera.aspect =
+                        window.innerWidth /
+                        window.innerHeight;
+
+
+                    camera.updateProjectionMatrix();
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           INITIAL LOAD
+        ===================================================== */
+
+        window.addEventListener(
+            "load",
+            function () {
+
+                hideTyping();
+
+                setTimeout(
+                    function () {
+
+                        scrollToBottom(
+                            "auto"
+                        );
+
+                    },
+                    150
+                );
+
+            }
+        );
+
+
+        /* =====================================================
+           ENTER KEY
+        ===================================================== */
+
+        input.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Enter" &&
+                    !event.shiftKey
+                ) {
+
+                    event.preventDefault();
+
+                    form.requestSubmit();
+
+                }
+
+            }
+        );
+
     </script>
 
 </body>
+
 </html>

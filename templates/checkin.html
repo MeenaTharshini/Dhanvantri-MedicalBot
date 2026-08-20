@@ -1,0 +1,2152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Dhanvantri | Daily Wellness Check-in</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="icon"
+          type="image/png"
+          href="{{ url_for('static', filename='logo1.png') }}">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            font-family: 'Poppins', sans-serif;
+
+            background: #0b0b0b;
+            color: white;
+
+            overflow-x: hidden;
+
+            cursor: none;
+        }
+
+
+        /* =====================================================
+           BACKGROUND
+        ===================================================== */
+
+        #bg {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            z-index: -3;
+        }
+
+
+        /* =====================================================
+           CURSOR
+        ===================================================== */
+
+        .cursor {
+
+            width: 10px;
+            height: 10px;
+
+            background: gold;
+
+            border-radius: 50%;
+
+            position: fixed;
+
+            pointer-events: none;
+
+            z-index: 9999;
+
+            transform: translate(-50%, -50%);
+
+            box-shadow:
+                0 0 10px gold,
+                0 0 20px rgba(255,215,0,0.5);
+        }
+
+
+        /* =====================================================
+           CURSOR TRAIL
+        ===================================================== */
+
+        #trailCanvas {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            pointer-events: none;
+
+            z-index: 1;
+        }
+
+
+        /* =====================================================
+           MAIN PAGE
+        ===================================================== */
+
+        .page {
+
+            width: 100%;
+
+            min-height: 100vh;
+
+            padding: 30px 20px 50px;
+
+            position: relative;
+
+            z-index: 2;
+        }
+
+
+        .container {
+
+            width: 100%;
+
+            max-width: 900px;
+
+            margin: auto;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+
+            text-align: center;
+
+            padding: 25px;
+
+            margin-bottom: 20px;
+
+            background:
+                rgba(255,255,255,0.05);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 10px 40px
+                rgba(0,0,0,0.3);
+        }
+
+
+        .logo {
+
+            width: 70px;
+            height: 70px;
+
+            object-fit: contain;
+
+            margin-bottom: 5px;
+
+            filter:
+                drop-shadow(
+                    0 0 12px
+                    rgba(255,215,0,0.35)
+                );
+        }
+
+
+        .header h1 {
+
+            margin: 5px 0;
+
+            font-size: 30px;
+
+            font-weight: 500;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        .header h1 span {
+
+            color: gold;
+
+            text-shadow:
+                0 0 15px
+                rgba(255,215,0,0.3);
+        }
+
+
+        .header p {
+
+            margin: 8px 0 0;
+
+            color: #aaa;
+
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        .top-nav {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 20px;
+        }
+
+
+        .nav-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 9px 16px;
+
+            border-radius: 10px;
+
+            text-decoration: none;
+
+            color: white;
+
+            background:
+                rgba(255,255,255,0.07);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.08);
+
+            transition: 0.3s;
+
+            font-size: 13px;
+        }
+
+
+        .nav-btn i {
+
+            font-size: 13px;
+        }
+
+
+        .nav-btn:hover {
+
+            background:
+                rgba(255,215,0,0.18);
+
+            border-color: gold;
+
+            color: gold;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* =====================================================
+           CARD
+        ===================================================== */
+
+        .card {
+
+            background:
+                rgba(255,255,255,0.055);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.08);
+
+            border-radius: 20px;
+
+            padding: 28px;
+
+            margin-bottom: 20px;
+
+            backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 15px 45px
+                rgba(0,0,0,0.35);
+
+            transition: 0.3s;
+        }
+
+
+        .card:hover {
+
+            border-color:
+                rgba(255,215,0,0.15);
+
+            box-shadow:
+                0 15px 50px
+                rgba(0,0,0,0.45);
+        }
+
+
+        /* =====================================================
+           CARD TITLE
+        ===================================================== */
+
+        .card-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 22px;
+        }
+
+
+        .card-title h2 {
+
+            margin: 0;
+
+            font-size: 20px;
+
+            font-weight: 500;
+        }
+
+
+        .card-title .icon {
+
+            width: 38px;
+            height: 38px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,215,0,0.10);
+
+            border:
+                1px solid
+                rgba(255,215,0,0.20);
+
+            color: gold;
+
+            font-size: 17px;
+        }
+
+
+        .subtitle {
+
+            color: #999;
+
+            font-size: 13px;
+
+            margin-top: -12px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        .message {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 12px 15px;
+
+            margin-bottom: 20px;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255,215,0,0.10);
+
+            border:
+                1px solid
+                rgba(255,215,0,0.25);
+
+            color: #f5d96b;
+
+            font-size: 13px;
+        }
+
+
+        .message i {
+
+            color: gold;
+
+            font-size: 15px;
+        }
+
+
+        /* =====================================================
+           FORM GRID
+        ===================================================== */
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 20px;
+        }
+
+
+        .form-group {
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .form-group.full {
+
+            grid-column:
+                1 / -1;
+        }
+
+
+        /* =====================================================
+           LABELS
+        ===================================================== */
+
+        .field-label {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 8px;
+
+            color: #ddd;
+
+            font-size: 13px;
+
+            font-weight: 500;
+        }
+
+
+        .field-label i {
+
+            width: 17px;
+
+            text-align: center;
+
+            color: gold;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           INPUTS
+        ===================================================== */
+
+        input,
+        select,
+        textarea {
+
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border-radius: 11px;
+
+            border:
+                1px solid
+                rgba(255,255,255,0.10);
+
+            outline: none;
+
+            background:
+                rgba(255,255,255,0.06);
+
+            color: white;
+
+            font-family:
+                'Poppins',
+                sans-serif;
+
+            font-size: 13px;
+
+            transition: 0.3s;
+        }
+
+
+        input::placeholder,
+        textarea::placeholder {
+
+            color: #777;
+        }
+
+
+        input:hover,
+        select:hover,
+        textarea:hover {
+
+            border-color:
+                rgba(255,215,0,0.25);
+        }
+
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+
+            border-color: gold;
+
+            background:
+                rgba(255,255,255,0.08);
+
+            box-shadow:
+                0 0 15px
+                rgba(255,215,0,0.08);
+        }
+
+
+        select option {
+
+            background: #181818;
+
+            color: white;
+        }
+
+
+        textarea {
+
+            min-height: 120px;
+
+            resize: vertical;
+        }
+
+
+        /* =====================================================
+           PRIVACY
+        ===================================================== */
+
+        .privacy {
+
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,255,255,0.04);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.06);
+
+            color: #999;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+        }
+
+
+        .privacy-icon {
+
+            color: gold;
+
+            font-size: 16px;
+
+            padding-top: 2px;
+        }
+
+
+        .privacy strong {
+
+            color: #ddd;
+        }
+
+
+        /* =====================================================
+           SAVE BUTTON
+        ===================================================== */
+
+        .save-button {
+
+            width: 100%;
+
+            margin-top: 25px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #FFD700,
+                    #C9A227
+                );
+
+            color: black;
+
+            font-family:
+                'Poppins',
+                sans-serif;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+
+            box-shadow:
+                0 5px 20px
+                rgba(255,215,0,0.12);
+        }
+
+
+        .save-button i {
+
+            margin-right: 8px;
+        }
+
+
+        .save-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 30px
+                rgba(255,215,0,0.25);
+        }
+
+
+        .save-button:active {
+
+            transform:
+                translateY(0);
+        }
+
+
+        /* =====================================================
+           RECENT CHECKINS
+        ===================================================== */
+
+        .checkin-item {
+
+            background:
+                rgba(255,255,255,0.045);
+
+            border:
+                1px solid
+                rgba(255,255,255,0.07);
+
+            border-left:
+                3px solid gold;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            margin-top: 12px;
+
+            transition: 0.3s;
+        }
+
+
+        .checkin-item:hover {
+
+            background:
+                rgba(255,255,255,0.07);
+
+            transform:
+                translateX(3px);
+
+            border-left-color:
+                #FFD700;
+        }
+
+
+        .checkin-date {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            color: gold;
+
+            font-size: 13px;
+
+            font-weight: 500;
+
+            margin-bottom: 12px;
+        }
+
+
+        .checkin-date i {
+
+            font-size: 13px;
+        }
+
+
+        .checkin-details {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 10px;
+        }
+
+
+        .detail {
+
+            background:
+                rgba(255,255,255,0.04);
+
+            padding: 10px;
+
+            border-radius: 9px;
+        }
+
+
+        .detail-label {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            color: #777;
+
+            font-size: 10px;
+
+            margin-bottom: 3px;
+        }
+
+
+        .detail-label i {
+
+            color: #999;
+
+            font-size: 10px;
+        }
+
+
+        .detail-value {
+
+            color: #ddd;
+
+            font-size: 12px;
+        }
+
+
+        .notes {
+
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 12px;
+
+            padding-top: 12px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,0.07);
+
+            color: #aaa;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        .notes i {
+
+            color: gold;
+
+            padding-top: 3px;
+        }
+
+
+        /* =====================================================
+           EMPTY
+        ===================================================== */
+
+        .empty {
+
+            text-align: center;
+
+            padding: 30px 15px;
+
+            color: #777;
+
+            font-size: 13px;
+        }
+
+
+        .empty-icon {
+
+            width: 55px;
+            height: 55px;
+
+            margin:
+                0 auto 12px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255,215,0,0.08);
+
+            border:
+                1px solid
+                rgba(255,215,0,0.15);
+
+            color: gold;
+
+            font-size: 22px;
+        }
+
+
+        /* =====================================================
+           BACK LINK
+        ===================================================== */
+
+        .back-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            margin-top: 20px;
+
+            text-decoration: none;
+
+            color: #aaa;
+
+            font-size: 13px;
+
+            transition: 0.3s;
+        }
+
+
+        .back-link:hover {
+
+            color: gold;
+        }
+
+
+        /* =====================================================
+           SCROLLBAR
+        ===================================================== */
+
+        ::-webkit-scrollbar {
+
+            width: 6px;
+        }
+
+
+        ::-webkit-scrollbar-track {
+
+            background: #0b0b0b;
+        }
+
+
+        ::-webkit-scrollbar-thumb {
+
+            background: gold;
+
+            border-radius: 10px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 700px) {
+
+            body {
+
+                cursor: auto;
+            }
+
+
+            .cursor {
+
+                display: none;
+            }
+
+
+            .page {
+
+                padding:
+                    15px 10px 35px;
+            }
+
+
+            .container {
+
+                width: 100%;
+            }
+
+
+            .header {
+
+                padding: 20px 15px;
+            }
+
+
+            .header h1 {
+
+                font-size: 23px;
+            }
+
+
+            .header p {
+
+                font-size: 12px;
+            }
+
+
+            .card {
+
+                padding: 20px 15px;
+
+                border-radius: 16px;
+            }
+
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .form-group.full {
+
+                grid-column: auto;
+            }
+
+
+            .checkin-details {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .top-nav {
+
+                gap: 7px;
+            }
+
+
+            .nav-btn {
+
+                font-size: 11px;
+
+                padding:
+                    8px 12px;
+            }
+
+        }
+
+
+        @media (max-width: 400px) {
+
+            .checkin-details {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     BACKGROUND
+===================================================== -->
+
+<div id="bg"></div>
+
+<canvas id="trailCanvas"></canvas>
+
+<div class="cursor" id="cursor"></div>
+
+
+<!-- =====================================================
+     PAGE
+===================================================== -->
+
+<div class="page">
+
+<div class="container">
+
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="header">
+
+        <img
+            class="logo"
+            src="{{ url_for('static', filename='logo1.png') }}"
+            alt="Dhanvantri Logo"
+        >
+
+        <h1>
+
+            <span>
+                <i class="fa-solid fa-leaf"></i>
+                Dhanvantri
+            </span>
+
+            Daily Wellness Check-in
+
+        </h1>
+
+        <p>
+            Take a moment to reflect on your wellness today.
+        </p>
+
+    </div>
+
+
+    <!-- =================================================
+         NAVIGATION
+    ================================================== -->
+
+    <div class="top-nav">
+
+        <a
+            href="{{ url_for('home') }}"
+            class="nav-btn"
+        >
+
+            <i class="fa-solid fa-house"></i>
+
+            Dhanvantri
+
+        </a>
+
+
+        <a
+            href="{{ url_for('profile') }}"
+            class="nav-btn"
+        >
+
+            <i class="fa-solid fa-user"></i>
+
+            My Profile
+
+        </a>
+
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="nav-btn"
+        >
+
+            <i class="fa-solid fa-chart-line"></i>
+
+            Dashboard
+
+        </a>
+
+    </div>
+
+
+    <!-- =================================================
+         CHECK-IN FORM
+    ================================================== -->
+
+    <div class="card">
+
+
+        {% if message %}
+
+            <div class="message">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <span>
+                    {{ message }}
+                </span>
+
+            </div>
+
+        {% endif %}
+
+
+        <div class="card-title">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-seedling"></i>
+
+            </div>
+
+            <h2>
+                How are you today?
+            </h2>
+
+        </div>
+
+
+        <p class="subtitle">
+
+            Your responses help you understand your
+            wellness patterns over time.
+
+        </p>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('checkin') }}"
+        >
+
+
+            <div class="form-grid">
+
+
+                <!-- SLEEP -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="sleep_hours"
+                    >
+
+                        <i class="fa-solid fa-moon"></i>
+
+                        Sleep Hours
+
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="sleep_hours"
+                        name="sleep_hours"
+                        min="0"
+                        max="24"
+                        step="0.5"
+                        placeholder="Example: 7.5"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- ENERGY -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="energy"
+                    >
+
+                        <i class="fa-solid fa-bolt"></i>
+
+                        Energy Level
+
+                    </label>
+
+
+                    <select
+                        id="energy"
+                        name="energy"
+                        required
+                    >
+
+                        <option value="">
+                            Select your energy
+                        </option>
+
+                        <option value="1">
+                            1 - Very Low
+                        </option>
+
+                        <option value="2">
+                            2 - Low
+                        </option>
+
+                        <option value="3">
+                            3 - Moderate
+                        </option>
+
+                        <option value="4">
+                            4 - Good
+                        </option>
+
+                        <option value="5">
+                            5 - Excellent
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- MOOD -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="mood"
+                    >
+
+                        <i class="fa-regular fa-face-smile"></i>
+
+                        Mood
+
+                    </label>
+
+
+                    <select
+                        id="mood"
+                        name="mood"
+                        required
+                    >
+
+                        <option value="">
+                            Select your mood
+                        </option>
+
+                        <option value="Very low">
+                            Very Low
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option value="Okay">
+                            Okay
+                        </option>
+
+                        <option value="Good">
+                            Good
+                        </option>
+
+                        <option value="Excellent">
+                            Excellent
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- STRESS -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="stress"
+                    >
+
+                        <i class="fa-solid fa-brain"></i>
+
+                        Stress Level
+
+                    </label>
+
+
+                    <select
+                        id="stress"
+                        name="stress"
+                        required
+                    >
+
+                        <option value="">
+                            Select stress level
+                        </option>
+
+                        <option value="1">
+                            1 - Very Low
+                        </option>
+
+                        <option value="2">
+                            2 - Low
+                        </option>
+
+                        <option value="3">
+                            3 - Moderate
+                        </option>
+
+                        <option value="4">
+                            4 - High
+                        </option>
+
+                        <option value="5">
+                            5 - Very High
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- HYDRATION -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="hydration"
+                    >
+
+                        <i class="fa-solid fa-droplet"></i>
+
+                        Hydration
+
+                    </label>
+
+
+                    <select
+                        id="hydration"
+                        name="hydration"
+                        required
+                    >
+
+                        <option value="">
+                            Select hydration
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option value="Moderate">
+                            Moderate
+                        </option>
+
+                        <option value="Good">
+                            Good
+                        </option>
+
+                        <option value="Excellent">
+                            Excellent
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ACTIVITY -->
+
+                <div class="form-group">
+
+                    <label
+                        class="field-label"
+                        for="activity_minutes"
+                    >
+
+                        <i class="fa-solid fa-person-running"></i>
+
+                        Physical Activity
+
+                    </label>
+
+
+                    <input
+                        type="number"
+                        id="activity_minutes"
+                        name="activity_minutes"
+                        min="0"
+                        max="1440"
+                        placeholder="Minutes today"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="form-group full">
+
+                    <label
+                        class="field-label"
+                        for="notes"
+                    >
+
+                        <i class="fa-solid fa-note-sticky"></i>
+
+                        Notes
+
+                    </label>
+
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        placeholder="How are you feeling today? Anything you want Dhanvantri to know?"
+                    ></textarea>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- PRIVACY -->
+
+            <div class="privacy">
+
+                <div class="privacy-icon">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>Your privacy matters.</strong>
+
+                    Your check-in responses are used to help
+                    you track your wellness patterns and
+                    personalize your Dhanvantri experience.
+
+                    This information is not a medical diagnosis
+                    and should not replace professional healthcare.
+
+                </div>
+
+            </div>
+
+
+            <!-- SAVE -->
+
+            <button
+                type="submit"
+                class="save-button"
+            >
+
+                <i class="fa-solid fa-floppy-disk"></i>
+
+                Save Today's Check-in
+
+            </button>
+
+
+        </form>
+
+
+        <a
+            href="{{ url_for('home') }}"
+            class="back-link"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to Dhanvantri
+
+        </a>
+
+
+    </div>
+
+
+    <!-- =================================================
+         RECENT CHECK-INS
+    ================================================== -->
+
+    <div class="card">
+
+
+        <div class="card-title">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+            </div>
+
+            <h2>
+                Recent Wellness Check-ins
+            </h2>
+
+        </div>
+
+
+        {% if checkins %}
+
+
+            {% for item in checkins %}
+
+
+                <div class="checkin-item">
+
+
+                    <div class="checkin-date">
+
+                        <i class="fa-regular fa-calendar"></i>
+
+                        {{ item.created_at if item.created_at
+                           else item.date }}
+
+                    </div>
+
+
+                    <div class="checkin-details">
+
+
+                        <!-- SLEEP -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-moon"></i>
+
+                                Sleep
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.sleep_hours }} hours
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- ENERGY -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-bolt"></i>
+
+                                Energy
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.energy }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- MOOD -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-regular fa-face-smile"></i>
+
+                                Mood
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.mood }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- STRESS -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-brain"></i>
+
+                                Stress
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.stress }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- HYDRATION -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-droplet"></i>
+
+                                Hydration
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.hydration }}
+
+                            </span>
+
+                        </div>
+
+
+                        <!-- ACTIVITY -->
+
+                        <div class="detail">
+
+                            <span class="detail-label">
+
+                                <i class="fa-solid fa-person-running"></i>
+
+                                Activity
+
+                            </span>
+
+                            <span class="detail-value">
+
+                                {{ item.activity_minutes }}
+                                minutes
+
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+
+                    {% if item.notes %}
+
+                        <div class="notes">
+
+                            <i class="fa-solid fa-note-sticky"></i>
+
+                            <div>
+
+                                <strong>Notes:</strong>
+
+                                {{ item.notes }}
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="empty">
+
+                <div class="empty-icon">
+
+                    <i class="fa-solid fa-seedling"></i>
+
+                </div>
+
+                <div>
+                    No check-ins yet.
+                </div>
+
+                <div>
+                    Your first wellness check-in
+                    will appear here.
+                </div>
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+/* =====================================================
+   CUSTOM CURSOR
+===================================================== */
+
+const cursor =
+    document.getElementById("cursor");
+
+
+window.addEventListener(
+    "mousemove",
+    function(e) {
+
+        cursor.style.left =
+            e.clientX + "px";
+
+        cursor.style.top =
+            e.clientY + "px";
+
+    }
+);
+
+
+
+/* =====================================================
+   CURSOR TRAIL
+===================================================== */
+
+const canvas =
+    document.getElementById("trailCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+function resizeCanvas() {
+
+    canvas.width =
+        window.innerWidth;
+
+    canvas.height =
+        window.innerHeight;
+}
+
+
+resizeCanvas();
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+let stars = [];
+
+
+window.addEventListener(
+    "mousemove",
+    function(e) {
+
+        stars.push({
+
+            x: e.clientX,
+
+            y: e.clientY,
+
+            size: 2,
+
+            life: 35
+
+        });
+
+    }
+);
+
+
+function animateStars() {
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    for (
+        let i = 0;
+        i < stars.length;
+        i++
+    ) {
+
+        let star = stars[i];
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            star.x,
+            star.y,
+            star.size,
+            0,
+            Math.PI * 2
+        );
+
+
+        ctx.fillStyle =
+            `rgba(
+                255,
+                215,
+                0,
+                ${star.life / 35}
+            )`;
+
+
+        ctx.fill();
+
+
+        star.size *= 0.95;
+
+        star.life--;
+
+
+        if (star.life <= 0) {
+
+            stars.splice(i, 1);
+
+            i--;
+
+        }
+
+    }
+
+
+    requestAnimationFrame(
+        animateStars
+    );
+}
+
+
+animateStars();
+
+
+
+/* =====================================================
+   THREE.JS BACKGROUND
+===================================================== */
+
+const script =
+    document.createElement("script");
+
+
+script.src =
+    "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js";
+
+
+script.onload = function() {
+
+
+    let scene =
+        new THREE.Scene();
+
+
+    let camera =
+        new THREE.PerspectiveCamera(
+            75,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            1000
+        );
+
+
+    let renderer =
+        new THREE.WebGLRenderer({
+
+            alpha: true,
+
+            antialias: true
+
+        });
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    renderer.domElement.style.position =
+        "fixed";
+
+
+    renderer.domElement.style.top =
+        "0";
+
+
+    renderer.domElement.style.left =
+        "0";
+
+
+    renderer.domElement.style.zIndex =
+        "-2";
+
+
+    document
+        .getElementById("bg")
+        .appendChild(
+            renderer.domElement
+        );
+
+
+    camera.position.z = 5;
+
+
+    const geometry =
+        new THREE.BufferGeometry();
+
+
+    const count = 1200;
+
+
+    const positions =
+        new Float32Array(
+            count * 3
+        );
+
+
+    for (
+        let i = 0;
+        i < count * 3;
+        i++
+    ) {
+
+        positions[i] =
+            (Math.random() - 0.5) * 10;
+
+    }
+
+
+    geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(
+            positions,
+            3
+        )
+    );
+
+
+    const material =
+        new THREE.PointsMaterial({
+
+            color: 0xFFD700,
+
+            size: 0.02,
+
+            transparent: true,
+
+            opacity: 0.8
+
+        });
+
+
+    const points =
+        new THREE.Points(
+            geometry,
+            material
+        );
+
+
+    scene.add(points);
+
+
+    function animate() {
+
+        requestAnimationFrame(
+            animate
+        );
+
+
+        points.rotation.y +=
+            0.0008;
+
+
+        points.rotation.x +=
+            0.0001;
+
+
+        renderer.render(
+            scene,
+            camera
+        );
+
+    }
+
+
+    animate();
+
+
+    window.addEventListener(
+        "resize",
+        function() {
+
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
+
+
+            camera.aspect =
+                window.innerWidth /
+                window.innerHeight;
+
+
+            camera.updateProjectionMatrix();
+
+        }
+    );
+
+};
+
+
+document.body.appendChild(script);
+
+
+
+/* =====================================================
+   FORM SUBMIT FEEDBACK
+===================================================== */
+
+const form =
+    document.querySelector("form");
+
+
+if (form) {
+
+    form.addEventListener(
+        "submit",
+        function() {
+
+            const button =
+                document.querySelector(
+                    ".save-button"
+                );
+
+
+            if (button) {
+
+                button.innerHTML =
+                    '<i class="fa-solid fa-spinner fa-spin"></i> Saving Check-in...';
+
+                button.style.opacity =
+                    "0.8";
+
+            }
+
+        }
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

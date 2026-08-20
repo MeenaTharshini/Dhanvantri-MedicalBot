@@ -4,11 +4,15 @@ from herbs import HERB_DB
 from werkzeug.security import generate_password_hash, check_password_hash
 import json, uuid, os, random
 from datetime import datetime
-from ai_engine import ai_response
+from core.ai_engine import ai_response
 from database import connect, create_tables
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from flask import jsonify
+from health.dashboard import get_dashboard_data
+
+from health.checkins import save_checkin, get_recent_checkins, create_checkin_table
+from health.profile import get_profile, save_profile, create_profile_table
 app = Flask(__name__)
 app.secret_key = "dhanvantri_secret"
 
@@ -16,8 +20,8 @@ app.secret_key = "dhanvantri_secret"
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'dhanvantribot.healthcompanion@gmail.com'
-app.config['MAIL_PASSWORD'] = 'slnturazucnfjztj'
+app.config["MAIL_USERNAME"] = os.getenv("MAIL_USERNAME")
+app.config["MAIL_PASSWORD"] = os.getenv("MAIL_PASSWORD")
 
 mail = Mail(app)
 serializer = URLSafeTimedSerializer(app.secret_key)
@@ -93,6 +97,46 @@ def save_chats(chats):
     with open(HISTORY_FILE, "w") as f:
         json.dump(all_chats, f, indent=4)
 
+@app.route("/profile", methods=["GET", "POST"])
+def profile():
+
+    # Check whether the user is logged in
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+
+    create_profile_table()
+
+    if request.method == "POST":
+
+        data = {
+            "age": request.form.get("age") or None,
+            "gender": request.form.get("gender"),
+            "wellness_goal": request.form.get("wellness_goal"),
+            "activity_level": request.form.get("activity_level"),
+            "sleep_hours": request.form.get("sleep_hours") or None,
+            "dietary_preference": request.form.get("dietary_preference"),
+            "wellness_interest": request.form.get("wellness_interest")
+        }
+
+        save_profile(user_id, data)
+
+        return redirect(url_for("profile", saved="1"))
+
+    profile_data = get_profile(user_id)
+
+    message = None
+
+    if request.args.get("saved") == "1":
+        message = "🌿 Your wellness profile has been saved successfully."
+
+    return render_template(
+        "profile.html",
+        profile=profile_data,
+        message=message
+    )
+
 # ---------------- HERBS ---------------- #
 def suggest_herbs(text):
     text = text.lower()
@@ -105,48 +149,332 @@ def suggest_herbs(text):
     return suggested
 
 def generate_chat_title(user_input):
-    text = user_input.lower()
+    """
+    Generate a short, intelligent title based on the user's
+    actual intention rather than copying the beginning of
+    the message.
+    """
 
-    # 🩺 Symptoms
+    text = user_input.lower().strip()
+
+    # =========================================================
+    # 🚨 MEDICAL EMERGENCIES
+    # =========================================================
+
+    emergency_patterns = [
+        "vomiting blood",
+        "vomit blood",
+        "throwing up blood",
+        "coughing blood",
+        "spitting blood",
+        "blood in vomit",
+        "severe bleeding",
+        "heavy bleeding",
+        "unconscious",
+        "not breathing",
+        "difficulty breathing",
+        "can't breathe",
+        "cannot breathe",
+        "chest pain",
+        "heart attack",
+        "stroke",
+        "seizure",
+        "severe allergic reaction",
+        "anaphylaxis",
+        "poisoning",
+        "overdose",
+        "suicide attempt",
+        "suicidal",
+        "severe injury",
+        "major accident"
+    ]
+
+    if any(pattern in text for pattern in emergency_patterns):
+        return "🚨 Medical Emergency"
+
+
+    # =========================================================
+    # 🩺 COMMON SYMPTOMS
+    # =========================================================
+
     symptom_titles = {
-        "stomach pain": "Stomach Pain Help",
+
+        "stomach pain": "Stomach Pain",
+        "stomach ache": "Stomach Pain",
+        "abdominal pain": "Abdominal Pain",
+        "belly pain": "Stomach Pain",
+
         "fever": "Fever Guidance",
+
+        "cough": "Cough Guidance",
+
         "cold": "Cold & Sneezing",
-        "cough": "Cough Treatment",
+        "sneezing": "Cold & Sneezing",
+        "runny nose": "Cold & Sneezing",
+
         "headache": "Headache Relief",
-        "allergy": "Allergy Guidance"
+        "migraine": "Headache & Migraine",
+
+        "allergy": "Allergy Guidance",
+        "allergic": "Allergy Guidance",
+
+        "sore throat": "Sore Throat",
+
+        "vomiting": "Vomiting & Nausea",
+        "vomit": "Vomiting & Nausea",
+        "nausea": "Nausea & Vomiting",
+
+        "diarrhea": "Digestive Problems",
+        "loose motion": "Digestive Problems",
+
+        "constipation": "Constipation",
+
+        "back pain": "Back Pain",
+        "neck pain": "Neck Pain",
+        "joint pain": "Joint Pain",
+
+        "tooth pain": "Tooth Pain",
+        "toothache": "Tooth Pain",
+
+        "dizziness": "Dizziness",
+        "vertigo": "Dizziness & Vertigo",
+
+        "fatigue": "Fatigue & Low Energy",
+        "tired": "Fatigue & Low Energy",
+        "exhausted": "Fatigue & Low Energy",
+
+        "insomnia": "Sleep Problems",
+        "can't sleep": "Sleep Problems",
+        "cannot sleep": "Sleep Problems",
+        "not sleeping": "Sleep Problems",
+
+        "period pain": "Menstrual Pain",
+        "period cramps": "Menstrual Pain",
+        "menstrual": "Menstrual Health"
     }
 
-    for key, title in symptom_titles.items():
-        if key in text:
+    for keyword, title in symptom_titles.items():
+        if keyword in text:
             return title
 
-    # 📚 Knowledge
+
+    # =========================================================
+    # 🧠 MENTAL WELLNESS
+    # =========================================================
+
+    if any(word in text for word in [
+        "anxiety",
+        "anxious",
+        "panic attack",
+        "panic"
+    ]):
+        return "Stress & Anxiety"
+
+    if any(word in text for word in [
+        "stress",
+        "stressed",
+        "overwhelmed",
+        "tension"
+    ]):
+        return "Stress Management"
+
+    if any(word in text for word in [
+        "sad",
+        "unhappy",
+        "lonely",
+        "depressed",
+        "depression"
+    ]):
+        return "Emotional Wellbeing"
+
+
+    # =========================================================
+    # 🌿 AYURVEDA / TRADITIONAL WELLNESS
+    # =========================================================
+
     if "ayurveda" in text or "ayurvedha" in text:
         return "About Ayurveda"
 
     if "siddha" in text:
         return "About Siddha Medicine"
 
-    # ❤️ Emotions
-    if any(word in text for word in ["sad", "depressed", "unhappy"]):
-        return "Feeling Sad"
+    if "yoga" in text:
+        return "Yoga & Wellness"
 
-    if any(word in text for word in ["stress", "anxiety", "worried"]):
-        return "Stress & Anxiety Help"
+    if "meditation" in text:
+        return "Meditation & Mindfulness"
 
-    if any(word in text for word in ["tired", "exhausted"]):
-        return "Low Energy"
+    if "pranayama" in text:
+        return "Pranayama & Breathing"
 
-    # 😄 Casual
-    if any(word in text for word in ["hi", "hello", "hey"]):
+
+    # =========================================================
+    # 🍎 LIFESTYLE / WELLNESS
+    # =========================================================
+
+    if any(word in text for word in [
+        "diet",
+        "nutrition",
+        "healthy food",
+        "what should i eat",
+        "what can i eat"
+    ]):
+        return "Healthy Diet & Nutrition"
+
+    if any(word in text for word in [
+        "weight loss",
+        "lose weight",
+        "losing weight"
+    ]):
+        return "Weight Management"
+
+    if any(word in text for word in [
+        "exercise",
+        "workout",
+        "fitness"
+    ]):
+        return "Fitness & Exercise"
+
+    if any(word in text for word in [
+        "sleep",
+        "sleeping"
+    ]):
+        return "Sleep & Rest"
+
+
+    # =========================================================
+    # 🌿 HERBS / NATURAL REMEDIES
+    # =========================================================
+
+    if any(word in text for word in [
+        "herb",
+        "herbal",
+        "turmeric",
+        "ginger",
+        "neem",
+        "tulsi",
+        "ashwagandha",
+        "aloe vera"
+    ]):
+        return "Herbs & Natural Remedies"
+
+
+    # =========================================================
+    # 📚 KNOWLEDGE QUESTIONS
+    # =========================================================
+
+    if "what is ayurveda" in text:
+        return "About Ayurveda"
+
+    if "what is siddha" in text:
+        return "About Siddha Medicine"
+
+    if any(word in text for word in [
+        "what is",
+        "what are",
+        "explain",
+        "meaning of",
+        "difference between",
+        "how does"
+    ]):
+        return "Health Information"
+
+
+    # =========================================================
+    # 👋 GREETINGS
+    # =========================================================
+
+    greetings = [
+        "hi",
+        "hello",
+        "hey",
+        "good morning",
+        "good afternoon",
+        "good evening"
+    ]
+
+    if any(
+        text == greeting or text.startswith(greeting + " ")
+        for greeting in greetings
+    ):
         return "Greeting"
 
-    # 🤖 Fallback → AI generate short title
+
+    # =========================================================
+    # 🤖 AI FALLBACK
+    # =========================================================
+
     try:
-        ai_title = ai_response(f"Give a very short 3-5 word title for: {user_input}")
-        return ai_title.split("\n")[0][:40]
-    except:
+
+        prompt = f"""
+You are a conversation-title generator.
+
+Read the user's complete message and determine its MAIN INTENT.
+
+User message:
+{user_input}
+
+Create a short title that summarizes the topic.
+
+Rules:
+- Use 2 to 5 words only.
+- Do NOT copy the beginning of the user's message.
+- Do NOT answer the question.
+- Do NOT explain anything.
+- Do NOT use quotation marks.
+- Do NOT use a period.
+- Focus on the main health topic or intention.
+- Return ONLY the title.
+
+Examples:
+
+"I am vomiting a lot of blood. What should I do?"
+Medical Emergency
+
+"My stomach hurts after eating"
+Stomach Pain
+
+"Why do I keep feeling tired?"
+Fatigue & Low Energy
+
+"What are the benefits of turmeric?"
+Turmeric Benefits
+
+"How can I reduce stress before exams?"
+Stress Management
+"""
+
+        ai_title = ai_response(prompt)
+
+        # Clean AI output
+        title = ai_title.strip()
+
+        # Remove markdown / quotes if AI adds them
+        title = title.replace('"', "")
+        title = title.replace("'", "")
+        title = title.replace("*", "")
+        title = title.replace("#", "")
+
+        # Only take first non-empty line
+        lines = [
+            line.strip()
+            for line in title.splitlines()
+            if line.strip()
+        ]
+
+        if lines:
+            title = lines[0]
+
+        # Prevent excessively long AI titles
+        if len(title) > 45:
+            title = title[:45].rsplit(" ", 1)[0]
+
+        return title or "Health Chat"
+
+    except Exception as e:
+
+        print("AI TITLE ERROR:", e)
+
         return "Health Chat"
 # ---------------- AUTH ---------------- #
 @app.route("/signup", methods=["GET", "POST"])
@@ -195,6 +523,8 @@ def login():
 
         if user and check_password_hash(user[3], password):
             session["user"] = username
+            session["user_id"] = user[0]
+
             return redirect(url_for("home"))
         else:
             error = "Invalid username or password"
@@ -204,6 +534,8 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop("user", None)
+    session.pop("user_id", None)
+
     return redirect(url_for("login"))
 
 # ---------------- CHAT ROUTES ---------------- #
@@ -238,6 +570,65 @@ def new_chat():
     save_chats(chats)
 
     return redirect(url_for("chat", chat_id=chat_id))
+@app.route("/checkin", methods=["GET", "POST"])
+def checkin():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+
+    create_checkin_table()
+
+    if request.method == "POST":
+
+        data = {
+            "sleep_hours": request.form.get("sleep_hours"),
+            "energy": request.form.get("energy"),
+            "mood": request.form.get("mood"),
+            "stress": request.form.get("stress"),
+            "hydration": request.form.get("hydration"),
+            "activity_minutes": request.form.get("activity_minutes"),
+            "notes": request.form.get("notes", "").strip()
+        }
+
+        save_checkin(user_id, data)
+
+        return redirect(url_for("checkin", saved="1"))
+
+    message = None
+
+    if request.args.get("saved") == "1":
+        message = "🌿 Today's wellness check-in has been saved."
+
+    recent_checkins = get_recent_checkins(user_id)
+
+    return render_template(
+        "checkin.html",
+        message=message,
+        checkins=recent_checkins
+    )
+
+# ---------------- DASHBOARD ---------------- #
+
+@app.route("/dashboard")
+def dashboard():
+
+    # User must be logged in
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+
+    # Get dashboard information
+    dashboard_data = get_dashboard_data(user_id)
+
+    return render_template(
+        "dashboard.html",
+        profile=dashboard_data["profile"],
+        checkins=dashboard_data["checkins"],
+        user=session.get("user")
+    )
 
 @app.route("/delete/<chat_id>")
 def delete_chat(chat_id):
@@ -328,52 +719,110 @@ def chat(chat_id):
 @app.route("/chat", methods=["POST"])
 def chat_api():
 
-    data = request.get_json()
-    chat_id = data.get("chat_id")
-    user_input = data.get("question", "").strip()
+    try:
+        data = request.get_json(silent=True) or {}
 
-    if not chat_id or not user_input:
-        return jsonify({"reply": "Missing data"}), 400
+        chat_id = data.get("chat_id")
+        user_input = data.get("question", "").strip()
 
-    chats = load_chats()
-    chat = next((c for c in chats if c["id"] == chat_id), None)
+        print("\n========== CHAT REQUEST ==========")
+        print("CHAT ID:", chat_id)
+        print("QUESTION:", user_input)
 
-    if not chat:
-        return jsonify({"reply": "Chat not found"}), 404
+        if not chat_id:
+            print("ERROR: Missing chat_id")
+            return jsonify({
+                "reply": "Chat ID is missing."
+            }), 400
 
-    # AI logic
-    rule_based = get_medical_response(user_input)
+        if not user_input:
+            print("ERROR: Empty question")
+            return jsonify({
+                "reply": "Please enter a question."
+            }), 400
 
-    if rule_based is not None:
-        answer = rule_based
-    else:
-        answer = ai_response(user_input)
+        chats = load_chats()
 
-    herbs = suggest_herbs(user_input)
-    if herbs:
-        answer += "\n\n🌿 Recommended Herbs:\n" + "\n".join(f"- {h}" for h in herbs)
+        chat = next(
+            (c for c in chats if c.get("id") == chat_id),
+            None
+        )
 
-    # save messages
-    chat["messages"].append({
-        "role": "user",
-        "content": user_input,
-        "time": datetime.now().strftime("%H:%M")
-    })
+        if not chat:
+            print("ERROR: Chat not found:", chat_id)
 
-    chat["messages"].append({
-        "role": "bot",
-        "content": answer,
-        "time": datetime.now().strftime("%H:%M")
-    })
+            return jsonify({
+                "reply": "Chat not found."
+            }), 404
 
-    if chat["title"] == "New Chat":
-        chat["title"] = generate_chat_title(user_input)
+        history = chat.get("messages", [])
 
-    save_chats(chats)
+        print("Calling AI...")
 
-    return jsonify({"reply": answer})
+        # IMPORTANT
+        answer = ai_response(
+            user_input=user_input,
+            history=history
+        )
+
+        print("AI RESPONSE:", answer)
+
+        if not answer:
+            answer = "I could not generate a response."
+
+        # ---------------- USER MESSAGE ----------------
+
+        chat["messages"].append({
+            "role": "user",
+            "content": user_input,
+            "time": datetime.now().strftime("%H:%M")
+        })
+
+        # ---------------- BOT MESSAGE ----------------
+
+        chat["messages"].append({
+            "role": "bot",
+            "content": str(answer),
+            "time": datetime.now().strftime("%H:%M")
+        })
+
+        # ---------------- TITLE ----------------
+
+        if chat.get("title") == "New Chat":
+            try:
+                chat["title"] = generate_chat_title(user_input)
+            except Exception as title_error:
+                print("TITLE ERROR:", title_error)
+                chat["title"] = "Health Chat"
+
+        save_chats(chats)
+
+        print("CHAT SAVED SUCCESSFULLY")
+        print("=================================\n")
+
+        return jsonify({
+            "reply": str(answer),
+            "title": chat["title"],
+            "chat_id": chat["id"]
+        })
+
+    except Exception as e:
+
+        print("\n========== CHAT ERROR ==========")
+        print(type(e).__name__)
+        print(str(e))
+        import traceback
+        traceback.print_exc()
+        print("================================\n")
+
+        return jsonify({
+            "reply": "AI service error. Check the Flask terminal."
+        }), 500
 # ---------------- RUN ---------------- #
 if __name__ == "__main__":
     init_files()
     create_tables()
+    create_profile_table()
+    create_checkin_table()
+
     app.run(debug=True)

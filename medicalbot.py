@@ -186,10 +186,10 @@ This may be due to temporary imbalance in body or digestion.
 🍲 Diet:
 - Eat: Light, warm food
 - Avoid: Spicy, oily items
-
+\n
 🧘 Lifestyle Tips:
 - Rest well
-- Stay hydrated
+- Stay hydrated\n
 """
 
         if data["questions"]:
