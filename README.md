@@ -9,7 +9,11 @@ Inspired by **Lord Dhanvantari**, the traditional symbol of Ayurveda and healing
 The system is designed not only to answer health-related questions, but also to recognize situations where providing ordinary chatbot advice may be unsafe.
 
 ---
-
+## Linkedin url: https://lnkd.in/p/gd52HZYa
+                 https://lnkd.in/p/gN2HRMb7
+                 https://lnkd.in/p/g7aRbkeJ
+                 https://lnkd.in/p/g7aRbkeJ
+                 
 ## 🩺 What Makes Dhanvantri AI Different?
 
 Dhanvantri AI follows a **hybrid safety-first architecture** that combines rule-based medical safeguards with AI-powered conversation.
